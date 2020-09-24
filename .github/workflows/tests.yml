@@ -1,0 +1,27 @@
+name: Tests
+on: push
+jobs:
+  tests:
+    name: Test python ${{ matrix.python }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+        - ubuntu-latest
+        - windows-latest
+        python:
+        - "3.6"
+        - "3.7"
+        - "3.8"
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python }}
+        architecture: x64
+    - name: Setup Graphviz
+      uses: ts-graphviz/setup-graphviz@v1
+    - run: pip install nox
+    - run: pip install poetry
+    - run: nox
+ 

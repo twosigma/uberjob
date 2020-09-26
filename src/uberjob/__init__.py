@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 """
-**überjob** is a Python package for building and running call graphs.
+**uberjob** is a Python package for building and running call graphs.
 
 Its powerful primitives can be combined to build massive and sophisticated pipelines. Previous outputs are automatically
 reused when possible, providing incremental builds for free and enabling seamless recovery from errors.

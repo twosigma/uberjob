@@ -1,9 +1,9 @@
-überjob
+uberjob
 =======
 
 .. automodule:: uberjob
 
-The lessons below introduce important concepts in überjob.
+The lessons below introduce important concepts in uberjob.
 
 .. toctree::
    :maxdepth: 2

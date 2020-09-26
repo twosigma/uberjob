@@ -3,7 +3,7 @@ Lesson 2: The Registry
 
 The :class:`~uberjob.Registry` is a mapping from nodes in a :class:`~uberjob.Plan` to value stores.
 Value stores are instances of :class:`~uberjob.ValueStore`, and represent how and where nodes are stored.
-When a Registry is provided when running a Plan, überjob automatically reuses stored values which are up to date and rebuilds those that are not.
+When a Registry is provided when running a Plan, uberjob automatically reuses stored values which are up to date and rebuilds those that are not.
 The Registry maintains two kind of relationships: `stored` and `sourced`. These are presented in the following examples.
 
 Example 1
@@ -85,7 +85,7 @@ If `z` is requested as output, it will be read from its value store instead of b
 
     <object data="_static/lesson2_3.svg" type="image/svg+xml"></object>
 
-überjob uses :meth:`uberjob.ValueStore.get_modified_time` to determine what is stale. The convention is to return ``None`` when the stored value is missing entirely.
+uberjob uses :meth:`uberjob.ValueStore.get_modified_time` to determine what is stale. The convention is to return ``None`` when the stored value is missing entirely.
 Manually delete `x.json` and then render the physical plan again. Note that `x` and `z` will get recomputed but `y` will not.
 
 .. code-block:: ipython

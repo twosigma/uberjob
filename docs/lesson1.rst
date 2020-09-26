@@ -1,7 +1,7 @@
 Lesson 1: The Plan
 ==================
 
-The :class:`~uberjob.Plan` is the core abstraction in überjob.
+The :class:`~uberjob.Plan` is the core abstraction in uberjob.
 It represents a symbolic call graph (not an instance of an execution).
 As a result, it can be inspected, it can be run multiple times, and it can be transformed in various ways.
 It's similar to a SQL query in this regard.
@@ -42,7 +42,7 @@ When not running in Jupyter, the console progress is used by default.
     <img src="_static/lesson1_ipython_progress.png"></img>
 
 A Plan can be rendered using :func:`uberjob.render`.
-The render function is a great tool for understanding how überjob works.
+The render function is a great tool for understanding how uberjob works.
 
 .. code-block:: ipython
 

@@ -135,11 +135,9 @@ def render(
     *,
     registry: Registry = None,
     predicate: typing.Callable[[Node, dict], bool] = None,
-    level: int = None,
-    style=None,
-    algorithm=None,
-    format=None
-):
+    level: typing.Optional[int] = None,
+    format: typing.Optional[str] = None
+) -> typing.Optional[bytes]:
     """
     Use :mod:`nxv` to render a plan's symbolic call graph.
 
@@ -148,7 +146,6 @@ def render(
     :param predicate: An optional node predicate ``f(u, d)`` that determines whether a node ``u`` with
                       attribute dict ``d`` will be included in the render.
     :param level: Optional maximum number of scope levels to view. Nodes are grouped by scope[:level].
-    :param style: The nxv.Style to use. Defaults to uberjob.rendering.default_style(registry).
     :param algorithm: The GraphViz layout algorithm to use.
     :param format: The nxv/GraphViz output format to produce.
     :return: The rendered graph.
@@ -189,9 +186,10 @@ def render(
                 if successor not in group
             )
 
+    style = default_style(registry)
     return nxv.render(
         graph,
-        style or default_style(registry),
-        algorithm=algorithm or "dot",
+        style,
+        algorithm="dot",
         format=format,
     )

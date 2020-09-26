@@ -3,7 +3,7 @@
 # uberjob
 
 [![PyPI Status](https://img.shields.io/pypi/v/uberjob.svg)](https://pypi.python.org/pypi/uberjob)
-![Tests](https://github.com/twosigma/uberjob/workflows/Tests/badge.svg)
+[![Tests](https://github.com/twosigma/uberjob/workflows/Tests/badge.svg)](https://github.com/twosigma/uberjob/actions)
 [![Documentation Status](https://readthedocs.org/projects/uberjob/badge/?version=latest)](https://uberjob.readthedocs.io/en/latest/?badge=latest)
 [![Codecov](https://codecov.io/gh/twosigma/uberjob/branch/main/graph/badge.svg)](https://codecov.io/gh/twosigma/uberjob)
 

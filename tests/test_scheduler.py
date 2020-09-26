@@ -20,6 +20,7 @@ BigData objects that are in the bound call lookup are counted, and a running max
 fully executed, it is asserted that the max is no greater than some threshold.
 """
 import random
+from functools import reduce
 from unittest import TestCase
 
 import uberjob
@@ -197,13 +198,12 @@ class SchedulerTestCase(TestCase):
     def test_criss_cross2(self):
         self._test_repeated_structure(create_criss_cross2, 16, 2)
 
-    # TODO: Figure out why this test sometimes fails on Windows
-    # def test_zipper(self):
-    #     plan = uberjob.Plan()
-    #     registry = uberjob.Registry()
-    #     inspector = BoundCallLookupInspector()
-    #     reduce(
-    #         lambda a, b: plan.call(inspector.foo, a, b),
-    #         (create_zipper(plan, registry, inspector.foo, 8) for _ in range(8)),
-    #     )
-    #     self.assert_max_big_datas(plan, registry, inspector, 2)
+    def test_zipper(self):
+        plan = uberjob.Plan()
+        registry = uberjob.Registry()
+        inspector = BoundCallLookupInspector()
+        reduce(
+            lambda a, b: plan.call(inspector.foo, a, b),
+            (create_zipper(plan, registry, inspector.foo, 8) for _ in range(8)),
+        )
+        self.assert_max_big_datas(plan, registry, inspector, 2)

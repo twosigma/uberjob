@@ -18,12 +18,13 @@ import itertools
 import operator
 
 import networkx as nx
-from uberjob_testing.util import UberjobTestCase, copy_with_line_offset
 
 import uberjob
 from uberjob._testing import TestStore
 from uberjob._util import Missing
 from uberjob._util.traceback import get_stack_frame
+
+from .util import UberjobTestCase, copy_with_line_offset
 
 
 class RegistryTestCase(UberjobTestCase):

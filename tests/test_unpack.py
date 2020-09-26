@@ -15,9 +15,9 @@
 #
 from unittest import TestCase
 
-from uberjob_testing import util
-
 import uberjob
+
+from . import util
 
 
 def ones():

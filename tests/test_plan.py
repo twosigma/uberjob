@@ -20,12 +20,13 @@ import re
 import tempfile
 
 import networkx as nx
-from uberjob_testing.util import UberjobTestCase, copy_with_line_offset
 
 import uberjob
 from uberjob._util.traceback import get_stack_frame
 from uberjob.graph import Call
 from uberjob.progress import console_progress, default_progress, html_progress
+
+from .util import UberjobTestCase, copy_with_line_offset
 
 
 class PlanTestCase(UberjobTestCase):

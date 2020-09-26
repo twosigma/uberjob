@@ -24,3 +24,12 @@ def test_render():
     plan = uberjob.Plan()
     plan.call(add, 2, 3)
     uberjob.render(plan, format="svg")
+
+
+def test_render_level():
+    plan = uberjob.Plan()
+    with plan.scope("x"):
+        x = plan.call(add, 2, 3)
+    with plan.scope("y"):
+        y = plan.call(add, x, 4)
+    uberjob.render(plan, level=1, format="svg")

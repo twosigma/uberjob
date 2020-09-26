@@ -20,7 +20,6 @@ BigData objects that are in the bound call lookup are counted, and a running max
 fully executed, it is asserted that the max is no greater than some threshold.
 """
 import random
-from functools import reduce
 from unittest import TestCase
 
 import uberjob

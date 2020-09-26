@@ -26,10 +26,6 @@ A Plan represents a call graph and a Registry maintains how and where
 values are stored.
 """
 
-import sys
-
-sys.path.insert(1, "C:\\Users\\timot\\Documents\\twosigma\\nxv\\src\\")
-
 __author__ = "Daniel Shields, Timothy Shields"
 __maintainer__ = "Daniel Shields, Timothy Shields"
 __email__ = "Daniel.Shields@twosigma.com, Timothy.Shields@twosigma.com"

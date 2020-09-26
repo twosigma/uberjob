@@ -264,7 +264,7 @@ class RegistryTestCase(UberjobTestCase):
         for i in range(n):
             p.add_dependency(y, z[i])
 
-        for i in range(2):
+        for _ in range(2):
             self.assertEqual(
                 uberjob.run(p, registry=r, output=z),
                 [a + sum(b * b for b in range(m)) for a in range(n)],

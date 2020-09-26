@@ -164,7 +164,7 @@ def render(
 
     if level is not None:
         scope_groups = OrderedDict()
-        for u, d in graph.nodes(data=True):
+        for u in graph.nodes():
             scope = get_scope(graph, u)
             if scope:
                 scope_groups.setdefault(scope[:level], []).append(u)

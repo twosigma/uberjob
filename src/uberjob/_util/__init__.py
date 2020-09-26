@@ -89,7 +89,7 @@ def repr_helper(instance, *args, defaults=None, **kwargs):
 def fully_qualified_name(x):
     qualname = getattr(x, "__qualname__", None)
     if not qualname:
-        if hasattr(x, "__call__"):
+        if callable(x):
             return fully_qualified_name(x.__class__)
         return str(x)
     module = getattr(x, "__module__", None)

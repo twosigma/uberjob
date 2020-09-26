@@ -22,8 +22,8 @@ def add(x, y):
 
 def test_render():
     plan = uberjob.Plan()
-    plan.call(add, 2, 3)
-    uberjob.render(plan, format="svg")
+    x = plan.call(add, 2, 3)
+    uberjob.render(plan, output=x, format="svg")
 
 
 def test_render_level():
@@ -32,4 +32,4 @@ def test_render_level():
         x = plan.call(add, 2, 3)
     with plan.scope("y"):
         y = plan.call(add, x, 4)
-    uberjob.render(plan, level=1, format="svg")
+    uberjob.render(plan, output=[x, y], level=1, format="svg")

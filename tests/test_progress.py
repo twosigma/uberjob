@@ -44,3 +44,16 @@ def test_html_progress_with_exception():
         with tempfile.TemporaryDirectory() as temp:
             path = os.path.join(temp, "uberjob.html")
             uberjob.run(plan, output=x, progress=uberjob.progress.html_progress(path))
+
+
+def test_ipython_progress():
+    plan = uberjob.Plan()
+    x = plan.call(add, 2, 3)
+    uberjob.run(plan, output=x, progress=uberjob.progress.ipython_progress)
+
+
+def test_ipython_progress_with_exception():
+    plan = uberjob.Plan()
+    x = plan.call(fail)
+    with pytest.raises(uberjob.CallError):
+        uberjob.run(plan, output=x, progress=uberjob.progress.ipython_progress)

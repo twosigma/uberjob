@@ -14,6 +14,7 @@
 # limitations under the License.
 #
 import uberjob
+from uberjob._testing import TestStore
 
 
 def add(x, y):
@@ -26,10 +27,17 @@ def test_render():
     uberjob.render(plan, format="svg")
 
 
+def test_render_registry():
+    plan = uberjob.Plan()
+    registry = uberjob.Registry()
+    x = plan.call(add, 2, 3)
+    registry.add(x, TestStore())
+    uberjob.render(plan, registry=registry, format="svg")
+
+
 def test_render_level():
     plan = uberjob.Plan()
     with plan.scope("x"):
         x = plan.call(add, 2, 3)
-    with plan.scope("y"):
-        plan.call(add, x, 4)
+    plan.call(add, x, 4)
     uberjob.render(plan, level=1, format="svg")

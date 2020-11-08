@@ -158,7 +158,7 @@ class SchedulerTestCase(TestCase):
     ):
         plan = shuffle_plan(plan)
         registry = shuffle_registry(registry)
-        physical_plan = uberjob.run(plan, registry=registry, dry_run=True)
+        physical_plan, _ = uberjob.run(plan, registry=registry, dry_run=True)
         bound_call_lookup, output_slot, process, physical_plan = prep_run_physical(
             physical_plan, inplace=True
         )

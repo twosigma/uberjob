@@ -191,7 +191,7 @@ def run(
     :param output: An optional symbolic output specification. It will be converted via :meth:`~uberjob.Plan.gather`.
     :param registry: An optional :class:`~uberjob.Registry` that may specify a
                      :class:`~uberjob.ValueStore` for each :class:`~uberjob.graph.Node`.
-    :param dry_run: If True, returns the plan that would be run without actually running it.
+    :param dry_run: If True, returns the physical plan and output node without actually running it.
     :param max_workers: The maximum number of threads that can be used to run the :class:`~uberjob.Plan`.
                         The default behavior is based on the core count.
     :param max_errors: The maximum number of errors that can occur before new calls stop being executed.
@@ -263,7 +263,7 @@ def run(
                 )
 
             if dry_run:
-                return plan
+                return plan, redirected_output_node
 
             return _run_physical_with_progress(
                 plan,

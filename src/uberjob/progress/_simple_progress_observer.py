@@ -19,6 +19,7 @@ import time
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from contextlib import contextmanager
+from typing import Tuple
 
 from uberjob.progress._progress_observer import ProgressObserver
 
@@ -191,19 +192,21 @@ class SimpleProgressObserver(ProgressObserver, ABC):
             self._stale = True
             yield
 
-    def increment_total(self, *, section: str, scope, amount: int):
+    def increment_total(self, *, section: str, scope: Tuple, amount: int) -> None:
         with self._lock_and_make_stale():
             self._state.increment_total(section, scope, amount)
 
-    def increment_running(self, *, section: str, scope):
+    def increment_running(self, *, section: str, scope: Tuple) -> None:
         with self._lock_and_make_stale():
             self._state.increment_running(section, scope)
 
-    def increment_completed(self, *, section: str, scope):
+    def increment_completed(self, *, section: str, scope: Tuple) -> None:
         with self._lock_and_make_stale():
             self._state.increment_completed(section, scope)
 
-    def increment_failed(self, *, section: str, scope, exception):
+    def increment_failed(
+        self, *, section: str, scope: Tuple, exception: Exception
+    ) -> None:
         with self._lock_and_make_stale():
             self._state.increment_failed(section, scope)
             if len(self._exception_tuples) < self._max_exception_count:

@@ -15,12 +15,17 @@
 #
 from uberjob._util import fully_qualified_name
 from uberjob._util.traceback import render_symbolic_traceback
+from uberjob.graph import Call
 
 
 class CallError(Exception):
-    """An exception was raised in a symbolic call."""
+    """
+    An exception was raised in a symbolic call.
 
-    def __init__(self, call):
+    :param call: The call.
+    """
+
+    def __init__(self, call: Call):
         super().__init__(
             "\n".join(
                 [

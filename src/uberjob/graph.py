@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 """Provides the underlying graph, node, and edge classes used by the :class:`~uberjob.Plan`."""
-from typing import Dict, List, Tuple
+from typing import Callable, Dict, List, Tuple
 
 import networkx as nx
 
@@ -59,7 +59,7 @@ class Call(Node):
 
     __slots__ = ("fn", "stack_frame")
 
-    def __init__(self, fn, *, stack_frame=None):
+    def __init__(self, fn: Callable, *, stack_frame=None):
         self.fn = fn
         self.stack_frame = stack_frame
 
@@ -98,7 +98,7 @@ class PositionalArg(Dependency):
 
     __slots__ = ("index",)
 
-    def __init__(self, index):
+    def __init__(self, index: int):
         self.index = index
 
     def __repr__(self):
@@ -122,7 +122,7 @@ class KeywordArg(Dependency):
 
     __slots__ = ("name", "index")
 
-    def __init__(self, name, index):
+    def __init__(self, name: str, index: int):
         self.name = name
         self.index = index
 
@@ -141,7 +141,12 @@ class KeywordArg(Dependency):
 
 
 def get_argument_nodes(graph: Graph, call: Call) -> Tuple[List[Node], Dict[str, Node]]:
-    """Return the symbolic args and kwargs of the given :class:`~uberjob.graph.Call`."""
+    """
+    Return the symbolic args and kwargs of the given :class:`~uberjob.graph.Call`.
+
+    :param graph: The graph.
+    :param call: The call.
+    """
     in_edges = graph.in_edges(call, keys=True)
 
     args = []
@@ -161,8 +166,13 @@ def get_argument_nodes(graph: Graph, call: Call) -> Tuple[List[Node], Dict[str, 
     return args, dict(keyword_arg_pairs)
 
 
-def get_scope(graph: Graph, node: Node):
-    """Return the scope of the given :class:`~uberjob.graph.Node`."""
+def get_scope(graph: Graph, node: Node) -> Tuple:
+    """
+    Return the scope of the given :class:`~uberjob.graph.Node`.
+
+    :param graph: The graph.
+    :param node: The node.
+    """
     return graph.nodes[node]["scope"]
 
 

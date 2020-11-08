@@ -19,7 +19,11 @@ from uberjob.stores._file_store import FileStore, staged_write
 
 
 class PickleFileStore(FileStore):
-    """A :class:`~uberjob.ValueStore` for storing a picklable value in a file."""
+    """
+    A :class:`~uberjob.ValueStore` for storing a picklable value in a file.
+
+    :param path: The path.
+    """
 
     def read(self):
         """Read the pickled value from the file."""
@@ -27,6 +31,10 @@ class PickleFileStore(FileStore):
             return pickle.load(inputfile)
 
     def write(self, value) -> None:
-        """Write a picklable value to the file."""
+        """
+        Write a picklable value to the file.
+
+        :param value: The value.
+        """
         with staged_write(self.path, "wb") as outputfile:
             pickle.dump(value, outputfile)

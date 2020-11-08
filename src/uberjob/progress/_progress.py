@@ -19,11 +19,15 @@ from uberjob.progress._progress_observer import ProgressObserver
 
 
 class Progress:
-    """A way to observe progress."""
+    """
+    A way to observe progress.
 
-    def __init__(self, observer: Callable[[], ProgressObserver]):
-        self._observer = observer
+    :param create_observer: A callable that creates a single-use progress observer.
+    """
+
+    def __init__(self, create_observer: Callable[[], ProgressObserver]):
+        self._create_observer = create_observer
 
     def observer(self) -> ProgressObserver:
-        """Get a single-use progress observer."""
-        return self._observer()
+        """Create a single-use progress observer."""
+        return self._create_observer()

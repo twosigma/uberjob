@@ -28,7 +28,12 @@ class TextFileStore(FileStore):
     :param encoding: The name of the encoding used to decode or encode the file.
     """
 
-    def __init__(self, path: typing.Union[str, pathlib.Path], *, encoding: str = None):
+    def __init__(
+        self,
+        path: typing.Union[str, pathlib.Path],
+        *,
+        encoding: typing.Optional[str] = None
+    ):
         super().__init__(path)
         self.encoding = encoding
 
@@ -38,7 +43,11 @@ class TextFileStore(FileStore):
             return inputfile.read()
 
     def write(self, value: str) -> None:
-        """Write a string value to the file."""
+        """
+        Write a string value to the file.
+
+        :param value: The value.
+        """
         with staged_write(self.path, encoding=self.encoding) as outputfile:
             outputfile.write(value)
 

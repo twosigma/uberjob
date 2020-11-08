@@ -47,7 +47,11 @@ ipython_progress = Progress(
 def html_progress(
     output: Union[str, pathlib.Path, Callable[[bytes], None]]
 ) -> Progress:
-    """Write observed progress to an HTML file."""
+    """
+    Write observed progress to an HTML file.
+
+    :param output: The output path or a function that will be called with the output bytes.
+    """
     return Progress(
         partial(
             HtmlProgressObserver, output, min_update_interval=30, max_update_interval=60
@@ -60,12 +64,16 @@ default_progress = ipython_progress if is_ipython() else console_progress
 
 
 def composite_progress(*members: Progress) -> Progress:
-    """Create a progress observer that forwards observations to all of its members."""
+    """
+    Create a progress observer that forwards observations to all of its members.
 
-    def make_observer():
+    :param members: The members.
+    """
+
+    def create_observer():
         return CompositeProgressObserver(progress.observer() for progress in members)
 
-    return Progress(make_observer)
+    return Progress(create_observer)
 
 
 __all__ = [

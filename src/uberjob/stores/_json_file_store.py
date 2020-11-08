@@ -29,7 +29,12 @@ class JsonFileStore(FileStore):
     :param encoding: The name of the encoding used to decode or encode the file.
     """
 
-    def __init__(self, path: typing.Union[str, pathlib.Path], *, encoding: str = None):
+    def __init__(
+        self,
+        path: typing.Union[str, pathlib.Path],
+        *,
+        encoding: typing.Optional[str] = None
+    ):
         super().__init__(path)
         self.encoding = encoding
 
@@ -39,7 +44,11 @@ class JsonFileStore(FileStore):
             return json.load(inputfile)
 
     def write(self, value) -> None:
-        """Write a JSON-serializable value to the file."""
+        """
+        Write a JSON-serializable value to the file.
+
+        :param value: The value.
+        """
         with staged_write(self.path, encoding=self.encoding) as outputfile:
             json.dump(value, outputfile, indent=4)
 

@@ -14,6 +14,7 @@
 # limitations under the License.
 #
 from abc import ABC, abstractmethod
+from typing import Tuple
 
 
 class ProgressObserver(ABC):
@@ -28,17 +29,39 @@ class ProgressObserver(ABC):
         """Stop observing progress."""
 
     @abstractmethod
-    def increment_total(self, *, section: str, scope, amount: int):
-        """Increment the number of entries in this section and scope by the specified amount."""
+    def increment_total(self, *, section: str, scope: Tuple, amount: int):
+        """
+        Increment the number of entries in this section and scope by the specified amount.
+
+        :param section: The section.
+        :param scope: The scope.
+        :param amount: The amount.
+        """
 
     @abstractmethod
-    def increment_running(self, *, section: str, scope):
-        """Increment the number of running entries in this section and scope. This method must be thread-safe."""
+    def increment_running(self, *, section: str, scope: Tuple):
+        """
+        Increment the number of running entries in this section and scope. This method must be thread-safe.
+
+        :param section: The section.
+        :param scope: The scope.
+        """
 
     @abstractmethod
-    def increment_completed(self, *, section: str, scope):
-        """Increment the number of completed entries in this section and scope. This method must be thread-safe."""
+    def increment_completed(self, *, section: str, scope: Tuple):
+        """
+        Increment the number of completed entries in this section and scope. This method must be thread-safe.
+
+        :param section: The section.
+        :param scope: The scope.
+        """
 
     @abstractmethod
-    def increment_failed(self, *, section: str, scope, exception):
-        """Increment the number of failed entries in this section and scope. This method must be thread-safe."""
+    def increment_failed(self, *, section: str, scope: Tuple, exception: Exception):
+        """
+        Increment the number of failed entries in this section and scope. This method must be thread-safe.
+
+        :param section: The section.
+        :param scope: The scope.
+        :param exception: The exception.
+        """

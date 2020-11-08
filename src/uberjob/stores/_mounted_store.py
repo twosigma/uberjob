@@ -42,11 +42,19 @@ class MountedStore(ValueStore, ABC):
 
     @abstractmethod
     def copy_to_local(self, local_path: str):
-        """Copy the value at the local_path into the store."""
+        """
+        Copy the value at the local_path into the store.
+
+        :param local_path: The local path.
+        """
 
     @abstractmethod
     def copy_from_local(self, local_path: str):
-        """Copy the value in the store to the local_path."""
+        """
+        Copy the value in the store to the local_path.
+
+        :param local_path: The local path.
+        """
 
     def read(self):
         with _path_context() as local_path:

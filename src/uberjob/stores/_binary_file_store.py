@@ -17,7 +17,11 @@ from uberjob.stores._file_store import FileStore, staged_write
 
 
 class BinaryFileStore(FileStore):
-    """A :class:`~uberjob.ValueStore` for storing a ``bytes`` value in a file."""
+    """
+    A :class:`~uberjob.ValueStore` for storing a ``bytes`` value in a file.
+
+    :param path: The path.
+    """
 
     def read(self) -> bytes:
         """Read the binary value from the file."""
@@ -25,6 +29,10 @@ class BinaryFileStore(FileStore):
             return inputfile.read()
 
     def write(self, value: bytes) -> None:
-        """Write a binary value to the file."""
+        """
+        Write a binary value to the file.
+
+        :param value: The value.
+        """
         with staged_write(self.path, mode="wb") as outputfile:
             outputfile.write(value)

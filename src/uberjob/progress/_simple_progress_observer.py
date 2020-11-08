@@ -192,21 +192,19 @@ class SimpleProgressObserver(ProgressObserver, ABC):
             self._stale = True
             yield
 
-    def increment_total(self, *, section: str, scope: Tuple, amount: int) -> None:
+    def increment_total(self, *, section: str, scope: Tuple, amount: int):
         with self._lock_and_make_stale():
             self._state.increment_total(section, scope, amount)
 
-    def increment_running(self, *, section: str, scope: Tuple) -> None:
+    def increment_running(self, *, section: str, scope: Tuple):
         with self._lock_and_make_stale():
             self._state.increment_running(section, scope)
 
-    def increment_completed(self, *, section: str, scope: Tuple) -> None:
+    def increment_completed(self, *, section: str, scope: Tuple):
         with self._lock_and_make_stale():
             self._state.increment_completed(section, scope)
 
-    def increment_failed(
-        self, *, section: str, scope: Tuple, exception: Exception
-    ) -> None:
+    def increment_failed(self, *, section: str, scope: Tuple, exception: Exception):
         with self._lock_and_make_stale():
             self._state.increment_failed(section, scope)
             if len(self._exception_tuples) < self._max_exception_count:

@@ -27,7 +27,11 @@ STAGING_SUFFIX = ".STAGING"
 
 
 def get_modified_time(path: Union[str, pathlib.Path]) -> Optional[dt.datetime]:
-    """Gets the modified time of the path, or ``None`` if it does not exist or is inaccessible."""
+    """
+    Gets the modified time of the path, or ``None`` if it does not exist or is inaccessible.
+
+    :param path: The path.
+    """
     try:
         t = os.path.getmtime(path)
     except OSError:
@@ -51,6 +55,8 @@ def staged_write_path(
 
     It yields a staging path which will be atomically renamed to the given path if an exception is not raised.
     If an exception is raised, the staging path will be deleted if it exists.
+
+    :param path: The path.
     """
     staging_path = f"{path}.STAGING"
     if isinstance(path, pathlib.Path):
@@ -72,6 +78,10 @@ def staged_write(
 
     It yields a staging file object which will be atomically renamed to the given path if an exception is not raised.
     If an exception is raised, the staging file will be deleted if it exists.
+
+    :param path: The path.
+    :param mode: The file open mode.
+    :param kwargs: Extra arguments to pass to :func:`open`.
     """
     if "w" not in mode:
         raise ValueError("The mode must include 'w'")
@@ -81,7 +91,11 @@ def staged_write(
 
 
 class FileStore(ValueStore, ABC):
-    """The abstract base class for storing a value in a file.."""
+    """
+    The abstract base class for storing a value in a file.
+
+    :param path: The path.
+    """
 
     def __init__(self, path: Union[str, pathlib.Path]):
         self.path = path
@@ -92,7 +106,11 @@ class FileStore(ValueStore, ABC):
 
     @abstractmethod
     def write(self, value) -> None:
-        """Write a value to the file."""
+        """
+        Write a value to the file.
+
+        :param value: The value.
+        """
 
     def get_modified_time(self) -> Optional[dt.datetime]:
         """Get the modified time of the file, or ``None`` if it does not exist or is inaccessible."""

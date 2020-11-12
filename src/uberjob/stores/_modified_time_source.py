@@ -25,6 +25,8 @@ class ModifiedTimeSource(ValueStore):
     A :class:`~uberjob.ValueStore` that takes a modified time in its constructor and returns it from
     ``read`` and ``get_modified_time``. Useful for ensuring that something gets updated every day regardless of whether
     any of its inputs were updated.
+
+    :param modified_time: The modified time.
     """
 
     def __init__(self, modified_time: typing.Optional[dt.datetime]):

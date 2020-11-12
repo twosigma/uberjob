@@ -27,7 +27,11 @@ class ValueStore(ABC):
 
     @abstractmethod
     def write(self, value) -> None:
-        """Write a value to the store."""
+        """
+        Write a value to the store.
+
+        :param value: The value.
+        """
 
     @abstractmethod
     def get_modified_time(self) -> typing.Optional[dt.datetime]:

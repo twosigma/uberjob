@@ -54,7 +54,7 @@ exclude_patterns = ["_build"]
 pygments_style = "sphinx"
 html_theme = "sphinx_rtd_theme"
 html_theme_options = {
-    "style_nav_header_background": "#8e6ca6",
+    "style_nav_header_background": "#343131",
 }
 html_context = {"logo": "logo/logo-128.png", "theme_logo_only": False}
 html_favicon = "_static/logo/logo-32.png"

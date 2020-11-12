@@ -100,27 +100,27 @@ class Registry:
         v = self.mapping.get(node)
         return v.value_store if v else None
 
-    def keys(self) -> typing.Iterable[Node]:
+    def keys(self) -> typing.KeysView[Node]:
         """
         Get all registered :class:`~uberjob.graph.Node` instances.
 
-        :return: An iterable of :class:`~uberjob.graph.Node`.
+        :return: A keys view of :class:`~uberjob.graph.Node`.
         """
         return self.mapping.keys()
 
-    def values(self) -> typing.Iterable[ValueStore]:
+    def values(self) -> typing.List[ValueStore]:
         """
         Get all registered :class:`~uberjob.ValueStore` instances.
 
-        :return:  An iterable of :class:`~uberjob.ValueStore`.
+        :return:  A list of :class:`~uberjob.ValueStore`.
         """
         return [v.value_store for v in self.mapping.values()]
 
-    def items(self) -> typing.Iterable[typing.Tuple[Node, ValueStore]]:
+    def items(self) -> typing.List[typing.Tuple[Node, ValueStore]]:
         """
         Get all registered (node, value_store) pairs.
 
-        :return: An iterable of (node, value_store) pairs.
+        :return: A list of (node, value_store) pairs.
         """
         return [(k, v.value_store) for k, v in self.mapping.items()]
 
@@ -152,3 +152,5 @@ class Registry:
             for node, registry_value in self.mapping.items()
         }
         return new_registry
+
+    __copy__ = copy

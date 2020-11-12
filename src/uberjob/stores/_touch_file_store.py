@@ -18,9 +18,11 @@ from uberjob.stores._file_store import FileStore, staged_write
 
 class TouchFileStore(FileStore):
     """
-    A :class:`~uberjob.ValueStore` for a touch file; it can be thought of as storing ``None`` in a file.
+    A :class:`~uberjob.ValueStore` for a touch file. It can be thought of as storing ``None`` in a file.
 
     It is useful for integrating side effects.
+
+    :param path: The path.
     """
 
     def read(self):
@@ -31,7 +33,11 @@ class TouchFileStore(FileStore):
         return None
 
     def write(self, value: None) -> None:
-        """Write the touch file after ensuring that the given value is ``None``."""
+        """
+        Write the touch file after ensuring that the given value is ``None``.
+
+        :param value: The value, which must be ``None``.
+        """
         if value is not None:
             raise TypeError("The value must be None.")
         with staged_write(self.path, "wb"):

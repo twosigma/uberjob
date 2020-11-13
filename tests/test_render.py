@@ -35,6 +35,17 @@ def test_render_registry():
     uberjob.render(plan, registry=registry, format="svg")
 
 
+def test_render_dry_run():
+    plan = uberjob.Plan()
+    registry = uberjob.Registry()
+    x = plan.call(add, 2, 3)
+    registry.add(x, TestStore())
+    uberjob.render(uberjob.run(plan, registry=registry, dry_run=True), format="svg")
+    uberjob.render(
+        uberjob.run(plan, registry=registry, output=x, dry_run=True), format="svg"
+    )
+
+
 def test_render_level():
     plan = uberjob.Plan()
     with plan.scope("x"):

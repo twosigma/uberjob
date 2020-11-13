@@ -131,7 +131,7 @@ class Scope:
 
 
 def render(
-    plan: typing.Union[Plan, Graph],
+    plan: typing.Union[Plan, Graph, typing.Tuple[Plan, typing.Optional[Node]]],
     *,
     registry: Registry = None,
     predicate: typing.Callable[[Node, dict], bool] = None,
@@ -146,12 +146,18 @@ def render(
     :param predicate: An optional node predicate ``f(u, d)`` that determines whether a node ``u`` with
                       attribute dict ``d`` will be included in the render.
     :param level: Optional maximum number of scope levels to view. Nodes are grouped by scope[:level].
-    :param algorithm: The GraphViz layout algorithm to use.
     :param format: The nxv/GraphViz output format to produce.
     :return: The rendered graph.
     """
     import nxv
 
+    if (
+        isinstance(plan, tuple)
+        and len(plan) == 2
+        and isinstance(plan[0], Plan)
+        and (isinstance(plan[1], Node) or plan[1] is None)
+    ):
+        plan = plan[0]
     validation.assert_is_instance(plan, "plan", (Plan, Graph))
     graph = (plan.graph if isinstance(plan, Plan) else plan).copy()
     if predicate:

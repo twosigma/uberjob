@@ -51,7 +51,7 @@ class Plan:
 
     def __init__(self):
         self.graph = Graph()
-        """The underlying :class:`networkx.MultiDiGraph`"""
+        """The underlying :class:`networkx.MultiDiGraph`."""
 
         self._scope = ()
         self._scope_lock = RLock()

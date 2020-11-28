@@ -1,3 +1,6 @@
+.. index::
+   single: API reference
+.. _api-reference:
 
 API Reference
 =============

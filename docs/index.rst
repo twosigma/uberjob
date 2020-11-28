@@ -6,14 +6,23 @@ uberjob
 The lessons below introduce important concepts in uberjob.
 
 .. toctree::
-   :maxdepth: 2
+   :caption: Lessons
+   :maxdepth: 1
+   :glob:
+
+   lesson*
+
+.. toctree::
+   :caption: Guides
+   :maxdepth: 1
+
+.. toctree::
+   :caption: Explanation
+   :maxdepth: 1
+
+.. toctree::
+   :caption: Reference
+   :maxdepth: 1
 
    api
-   lesson1
-   lesson2
-   lesson3
-   lesson4
-   lesson5
-   lesson6
-   lesson7
-   lesson8
+   genindex

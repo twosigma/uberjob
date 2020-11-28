@@ -44,3 +44,9 @@ To run the test suite:
 To build the documentation:
 
     python -m nox -rs docs
+
+# Contributing
+
+Before making code contributions, please fill out the appropriate Contributor License Agreement in the `cla` folder and submit it to [tsos@twosigma.com](mailto:tsos@twosigma.com).
+
+© Two Sigma Open Source, LLC

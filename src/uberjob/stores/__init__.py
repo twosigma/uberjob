@@ -16,6 +16,7 @@
 from ._binary_file_store import BinaryFileStore
 from ._file_store import FileStore, get_modified_time, staged_write, staged_write_path
 from ._json_file_store import JsonFileStore
+from ._literal_source import LiteralSource
 from ._modified_time_source import ModifiedTimeSource
 from ._mounted_store import MountedStore
 from ._path_source import PathSource
@@ -30,6 +31,7 @@ __all__ = [
     "staged_write",
     "staged_write_path",
     "JsonFileStore",
+    "LiteralSource",
     "ModifiedTimeSource",
     "MountedStore",
     "PathSource",

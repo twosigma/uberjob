@@ -26,6 +26,7 @@ from uberjob.stores import (
     BinaryFileStore,
     FileStore,
     JsonFileStore,
+    LiteralSource,
     ModifiedTimeSource,
     MountedStore,
     PathSource,
@@ -191,5 +192,15 @@ class ValueStoresTestCase(TestCase):
         t = dt.datetime(2019, 1, 2, 3, 4, 5)
         value_store = ModifiedTimeSource(t)
         self.assertEqual(value_store.read(), t)
+        self.assertEqual(value_store.get_modified_time(), t)
+        repr(value_store)
+
+    def test_literal_source(self):
+        value = 7
+        t = dt.datetime(2019, 1, 2, 3, 4, 5)
+        value_store = LiteralSource(value, t)
+        with self.assertRaises(NotImplementedError):
+            value_store.write(value)
+        self.assertEqual(value_store.read(), value)
         self.assertEqual(value_store.get_modified_time(), t)
         repr(value_store)

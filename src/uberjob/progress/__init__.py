@@ -33,13 +33,23 @@ null_progress = Progress(NullProgressObserver)
 
 
 console_progress = Progress(
-    partial(ConsoleProgressObserver, min_update_interval=30, max_update_interval=300)
+    partial(
+        ConsoleProgressObserver,
+        initial_update_delay=3,
+        min_update_interval=30,
+        max_update_interval=300,
+    )
 )
 """Display observed progress using the console."""
 
 
 ipython_progress = Progress(
-    partial(IPythonProgressObserver, min_update_interval=1, max_update_interval=10)
+    partial(
+        IPythonProgressObserver,
+        initial_update_delay=1,
+        min_update_interval=1,
+        max_update_interval=10,
+    )
 )
 """Display observed progress using IPython widgets."""
 
@@ -54,7 +64,11 @@ def html_progress(
     """
     return Progress(
         partial(
-            HtmlProgressObserver, output, min_update_interval=30, max_update_interval=60
+            HtmlProgressObserver,
+            output,
+            initial_update_delay=3,
+            min_update_interval=30,
+            max_update_interval=60,
         )
     )
 

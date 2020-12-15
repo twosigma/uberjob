@@ -96,10 +96,12 @@ class HtmlProgressObserver(SimpleProgressObserver):
         self,
         output: Union[str, pathlib.Path, Callable[[bytes], None]],
         *,
+        initial_update_delay,
         min_update_interval,
         max_update_interval
     ):
         super().__init__(
+            initial_update_delay=initial_update_delay,
             min_update_interval=min_update_interval,
             max_update_interval=max_update_interval,
         )

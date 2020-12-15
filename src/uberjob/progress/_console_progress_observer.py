@@ -66,8 +66,11 @@ def _print_new_exceptions(print_, new_exception_index, exception_tuples):
 class ConsoleProgressObserver(SimpleProgressObserver):
     """An observer that prints progress to the console."""
 
-    def __init__(self, *, min_update_interval, max_update_interval):
+    def __init__(
+        self, *, initial_update_delay, min_update_interval, max_update_interval
+    ):
         super().__init__(
+            initial_update_delay=initial_update_delay,
             min_update_interval=min_update_interval,
             max_update_interval=max_update_interval,
         )

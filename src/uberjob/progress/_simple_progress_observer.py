@@ -123,8 +123,14 @@ class State:
 
 class SimpleProgressObserver(ProgressObserver, ABC):
     def __init__(
-        self, *, min_update_interval, max_update_interval, max_exception_count=128
+        self,
+        *,
+        initial_update_delay,
+        min_update_interval,
+        max_update_interval,
+        max_exception_count=128,
     ):
+        self._initial_update_delay = initial_update_delay
         self._min_update_interval = min_update_interval
         self._max_update_interval = max_update_interval
         self._max_exception_count = max_exception_count
@@ -148,9 +154,9 @@ class SimpleProgressObserver(ProgressObserver, ABC):
         pass
 
     def __enter__(self):
+        self._start_time = time.time()
         self._thread = threading.Thread(target=self._run_update_thread)
         self._thread.start()
-        self._start_time = time.time()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._done_event.set()
@@ -179,8 +185,12 @@ class SimpleProgressObserver(ProgressObserver, ABC):
 
     def _run_update_thread(self):
         done = False
+        first = True
         while not done:
-            done = self._done_event.wait(self._min_update_interval)
+            done = self._done_event.wait(
+                self._initial_update_delay if first else self._min_update_interval
+            )
+            first = False
             with self._lock:
                 output_value = self._do_render()
             if output_value is not None:

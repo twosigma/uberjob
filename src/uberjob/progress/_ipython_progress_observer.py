@@ -27,8 +27,11 @@ from uberjob.progress._simple_progress_observer import (
 class IPythonProgressObserver(SimpleProgressObserver):
     """An observer that displays progress in a Jupyter Notebook using IPython Widgets."""
 
-    def __init__(self, *, min_update_interval, max_update_interval):
+    def __init__(
+        self, *, initial_update_delay, min_update_interval, max_update_interval
+    ):
         super().__init__(
+            initial_update_delay=initial_update_delay,
             min_update_interval=min_update_interval,
             max_update_interval=max_update_interval,
         )

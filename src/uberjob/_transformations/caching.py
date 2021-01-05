@@ -19,7 +19,6 @@ from typing import Callable, Optional, Set, Tuple
 from uberjob._execution.run_function_on_graph import run_function_on_graph
 from uberjob._plan import Plan
 from uberjob._registry import Registry, RegistryValue
-from uberjob._scope import get_implicit_scope, set_implicit_scope
 from uberjob._transformations import get_mutable_plan
 from uberjob._transformations.pruning import prune_plan, prune_source_literals
 from uberjob._util import Slot, safe_max
@@ -63,7 +62,7 @@ def _get_stale_nodes(
             for predecessor in plan.graph.predecessors(node)
         )
         value_store = registry.get(node)
-        if not value_store:
+        if value_store is None:
             modified_time_lookup[node].value = max_ancestor_modified_time
             return
         modified_time = _to_naive_local_timezone(retry(value_store.get_modified_time)())
@@ -107,13 +106,13 @@ def _get_stale_nodes(
 def _add_value_store(
     plan: Plan, node: Node, registry_value: RegistryValue, *, is_stale: bool
 ) -> Tuple[Optional[Node], Node]:
-    def nested_call(*args, **kwargs):
-        call = plan.call(*args, **kwargs)
-        call.stack_frame = registry_value.stack_frame
-        implicit_scope = get_implicit_scope(plan.graph, node) + get_implicit_scope(
-            plan.graph, call
+    def nested_call(*args):
+        call = plan._call(registry_value.stack_frame, *args)
+        call_data = plan.graph.nodes[call]
+        call_data["implicit_scope"] = (
+            plan.graph.nodes[node].get("implicit_scope", ())
+            + call_data["implicit_scope"]
         )
-        set_implicit_scope(plan.graph, call, implicit_scope)
         return call
 
     out_edges = list(plan.graph.out_edges(node, keys=True))
@@ -127,12 +126,12 @@ def _add_value_store(
             if registry_value.is_source:
                 write_node = plan.lit(Barrier)
                 for predecessor in plan.graph.predecessors(node):
-                    plan.add_dependency(predecessor, write_node)
+                    plan.graph.add_edge(predecessor, write_node, Dependency())
             else:
                 write_node = nested_call(
                     value_store.__class__.write, value_store_lit, node
                 )
-            plan.add_dependency(write_node, read_node)
+            plan.graph.add_edge(write_node, read_node, Dependency())
 
     for _, successor, dependency in out_edges:
         plan.graph.remove_edge(node, successor, dependency)
@@ -141,7 +140,7 @@ def _add_value_store(
             plan.graph.add_edge(read_node, successor, dependency)
         elif is_stale:
             assert dependency_type is Dependency
-            plan.add_dependency(write_node, successor)
+            plan.graph.add_edge(write_node, successor, dependency)
 
     return write_node, read_node
 

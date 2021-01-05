@@ -19,7 +19,6 @@ from threading import RLock
 from typing import Callable, ContextManager, Tuple
 
 from uberjob import _builtins
-from uberjob._scope import set_full_scope
 from uberjob._util import fully_qualified_name, validation
 from uberjob._util.traceback import get_stack_frame
 from uberjob.graph import (
@@ -52,19 +51,23 @@ class Plan:
     def __init__(self):
         self.graph = Graph()
         """The underlying :class:`networkx.MultiDiGraph`."""
-
         self._scope = ()
         self._scope_lock = RLock()
 
-    def _add_node(self, node: Node, *, implicit_scope=None):
-        self.graph.add_node(node)
-        set_full_scope(self.graph, node, self._scope, implicit_scope)
-
-    def _add_edge(self, u: Node, v: Node, e: Dependency):
-        for node in (u, v):
-            if not self.graph.has_node(node):
-                raise Exception(f"The plan graph does not contain the node {node!r}.")
-        self.graph.add_edge(u, v, e)
+    def _call(self, stack_frame, fn: Callable, *args, **kwargs) -> Call:
+        call = Call(fn, stack_frame=stack_frame)
+        self.graph.add_node(
+            call, scope=self._scope, implicit_scope=(fully_qualified_name(fn),)
+        )
+        for index, arg in enumerate(args):
+            self.graph.add_edge(
+                self._gather(stack_frame, arg), call, PositionalArg(index)
+            )
+        for index, (name, arg) in enumerate(kwargs.items()):
+            self.graph.add_edge(
+                self._gather(stack_frame, arg), call, KeywordArg(name, index)
+            )
+        return call
 
     def call(self, fn: Callable, *args, **kwargs) -> Call:
         """
@@ -80,14 +83,7 @@ class Plan:
         """
         validation.assert_is_callable(fn, "fn")
         validation.assert_can_bind(fn, *args, **kwargs)
-        call = Call(fn, stack_frame=get_stack_frame())
-
-        self._add_node(call, implicit_scope=(fully_qualified_name(fn),))
-        for index, arg in enumerate(args):
-            self._add_edge(self.gather(arg), call, PositionalArg(index))
-        for index, (name, arg) in enumerate(kwargs.items()):
-            self._add_edge(self.gather(arg), call, KeywordArg(name, index))
-        return call
+        return self._call(get_stack_frame(), fn, *args, **kwargs)
 
     def lit(self, value) -> Literal:
         """
@@ -96,10 +92,10 @@ class Plan:
         :param value: The literal value.
         :return: The symbolic literal value.
         """
-        if isinstance(value, Node):
+        if _is_node(value):
             raise TypeError(f"The value is already a {Node.__name__}.")
         literal = Literal(value)
-        self._add_node(literal)
+        self.graph.add_node(literal, scope=self._scope)
         return literal
 
     def add_dependency(self, source: Node, target: Node) -> None:
@@ -112,7 +108,24 @@ class Plan:
         """
         validation.assert_is_instance(source, "source", Node)
         validation.assert_is_instance(target, "target", Node)
-        self._add_edge(source, target, Dependency())
+        for node in (source, target):
+            if not self.graph.has_node(node):
+                raise Exception(f"The plan graph does not contain the node {node!r}.")
+        self.graph.add_edge(source, target, Dependency())
+
+    def _gather(self, stack_frame, value) -> Node:
+        def recurse(root):
+            root_type = type(root)
+            gather_fn = GATHER_LOOKUP.get(root_type)
+            if gather_fn is not None:
+                items = root.items() if root_type is dict else root
+                children = [recurse(item) for item in items]
+                if any(_is_node(child) for child in children):
+                    return self._call(stack_frame, gather_fn, *children)
+            return root
+
+        value = recurse(value)
+        return value if _is_node(value) else self.lit(value)
 
     def gather(self, value) -> Node:
         """
@@ -127,19 +140,7 @@ class Plan:
         :param value: A structured value that may contain instances of :class:`~uberjob.graph.Node`.
         :return: A single :class:`~uberjob.graph.Node` representing the gathered input value.
         """
-
-        def recurse(root):
-            root_type = type(root)
-            gather_fn = GATHER_LOOKUP.get(root_type)
-            if gather_fn:
-                items = root.items() if root_type is dict else root
-                children = [recurse(item) for item in items]
-                if any(_is_node(child) for child in children):
-                    return self.call(gather_fn, *children)
-            return root
-
-        value = recurse(value)
-        return value if _is_node(value) else self.lit(value)
+        return self._gather(get_stack_frame(), value)
 
     def unpack(self, iterable, length: int) -> Tuple[Node, ...]:
         """
@@ -151,8 +152,12 @@ class Plan:
         """
         if not isinstance(length, int) or length < 0:
             raise ValueError("length must be a non-negative integer.")
-        t = self.call(_builtins.unpack, iterable, length)
-        return tuple(self.call(operator.getitem, t, index) for index in range(length))
+        stack_frame = get_stack_frame()
+        t = self._call(stack_frame, _builtins.unpack, iterable, length)
+        return tuple(
+            self._call(stack_frame, operator.getitem, t, index)
+            for index in range(length)
+        )
 
     @contextmanager
     def scope(self, *args) -> ContextManager[None]:

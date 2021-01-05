@@ -55,7 +55,7 @@ def _create_bound_call_lookup_and_output_slot(
     plan: Plan, output_node: Optional[Node] = None
 ):
     result_lookup = {
-        node: Slot(node.value if type(node) is Literal else None)
+        node: node if type(node) is Literal else Slot(None)
         for node in plan.graph.nodes()
     }
     bound_call_lookup = {
@@ -74,6 +74,10 @@ class PrepRunPhysical(NamedTuple):
     plan: Plan
 
 
+def _default_on_failed(node: Node, e: Exception):
+    pass
+
+
 def prep_run_physical(
     plan: Plan,
     *,
@@ -88,24 +92,24 @@ def prep_run_physical(
         plan, output_node
     )
     plan = prune_source_literals(plan, inplace=inplace)
+    on_started = on_started or identity
+    on_completed = on_completed or identity
+    on_failed = on_failed or _default_on_failed
     retry = retry or identity
 
     def process(node):
         if type(node) is Call:
-            if on_started is not None:
-                on_started(node)
-
+            on_started(node)
+            bound_call = bound_call_lookup[node]
             try:
-                bound_call = bound_call_lookup[node]
                 retry(bound_call.value.run)()
-                bound_call.value = None
             except Exception as e:
-                if on_failed is not None:
-                    on_failed(node, e)
+                on_failed(node, e)
                 raise
+            finally:
+                bound_call.value = None
 
-            if on_completed is not None:
-                on_completed(node)
+            on_completed(node)
 
     return PrepRunPhysical(bound_call_lookup, output_slot, process, plan)
 

@@ -15,6 +15,7 @@
 #
 import inspect
 import typing
+from functools import lru_cache
 
 from uberjob._util import fully_qualified_name
 
@@ -55,6 +56,7 @@ def assert_is_instance(
         )
 
 
+@lru_cache(4096)
 def try_get_signature(fn: typing.Callable):
     try:
         return inspect.signature(fn)
@@ -64,7 +66,7 @@ def try_get_signature(fn: typing.Callable):
 
 def assert_can_bind(fn: typing.Callable, *args, **kwargs):
     sig = try_get_signature(fn)
-    if not sig:
+    if sig is None:
         return
     try:
         sig.bind(*args, **kwargs)

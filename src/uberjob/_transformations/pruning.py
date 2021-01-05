@@ -67,7 +67,7 @@ def _prune_literal_if_trivial(plan: Plan, literal: Literal) -> None:
         return
 
     for predecessor, successor in itertools.product(predecessors, successors):
-        plan.add_dependency(predecessor, successor)
+        plan.graph.add_edge(predecessor, successor, Dependency())
     plan.graph.remove_node(literal)
 
 

@@ -22,14 +22,13 @@ from uberjob._execution.run_function_on_graph import NodeError
 from uberjob._execution.run_physical import run_physical
 from uberjob._plan import Plan
 from uberjob._registry import Registry
-from uberjob._scope import get_full_scope
 from uberjob._transformations import get_mutable_plan
 from uberjob._transformations.caching import plan_with_value_stores
 from uberjob._transformations.pruning import prune_plan
 from uberjob._util import fully_qualified_name
 from uberjob._util.retry import create_retry
 from uberjob._util.validation import assert_is_callable, assert_is_instance
-from uberjob.graph import Call, Node
+from uberjob.graph import Call, Graph, Node
 from uberjob.progress import (
     Progress,
     composite_progress,
@@ -38,9 +37,14 @@ from uberjob.progress import (
 )
 
 
+def _get_full_scope(graph: Graph, node: Node):
+    node_data = graph.nodes[node]
+    return node_data["scope"] + node_data.get("implicit_scope", ())
+
+
 def _get_scope_call_counts(plan: Plan):
     return collections.Counter(
-        get_full_scope(plan.graph, node)
+        _get_full_scope(plan.graph, node)
         for node in plan.graph.nodes()
         if type(node) is Call
     )
@@ -60,7 +64,7 @@ def _prepare_plan_with_registry_and_progress(
     graph = plan.graph
 
     def get_stale_scope(node):
-        scope = get_full_scope(graph, node)
+        scope = _get_full_scope(graph, node)
         value_store = registry.get(node)
         if not value_store:
             return scope
@@ -110,19 +114,19 @@ def _run_physical_with_progress(
 
     def on_started_run(node):
         progress_observer.increment_running(
-            section="run", scope=get_full_scope(graph, node)
+            section="run", scope=_get_full_scope(graph, node)
         )
 
     def on_completed_run(node):
         progress_observer.increment_completed(
-            section="run", scope=get_full_scope(graph, node)
+            section="run", scope=_get_full_scope(graph, node)
         )
 
     def on_failed_run(node, exception):
         call_error = CallError(node)
         call_error.__cause__ = exception
         progress_observer.increment_failed(
-            section="run", scope=get_full_scope(graph, node), exception=call_error
+            section="run", scope=_get_full_scope(graph, node), exception=call_error
         )
 
     return run_physical(

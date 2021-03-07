@@ -222,18 +222,19 @@ class PlanTestCase(UberjobTestCase):
 
     def test_max_workers_and_max_errors_validation(self):
         plan = uberjob.Plan()
-        with self.assertRaises(TypeError):
-            uberjob.run(plan, max_workers="hello")
-        with self.assertRaises(TypeError):
-            uberjob.run(plan, max_workers=1.0)
-        with self.assertRaises(TypeError):
-            uberjob.run(plan, max_errors="hello")
-        with self.assertRaises(TypeError):
-            uberjob.run(plan, max_errors=1.0)
-        with self.assertRaises(ValueError):
-            uberjob.run(plan, max_workers=-1)
-        with self.assertRaises(ValueError):
-            uberjob.run(plan, max_workers=0)
+
+        for arg_name in ["max_workers", "max_errors", "stale_check_max_workers"]:
+            for arg_value in ["hello", 1.0]:
+                with self.subTest(arg_name=arg_name, arg_value=arg_value):
+                    with self.assertRaises(TypeError):
+                        uberjob.run(plan, **{arg_name: arg_value})
+
+        for arg_name in ["max_workers", "stale_check_max_workers"]:
+            for arg_value in [-1, 0]:
+                with self.subTest(arg_name=arg_name, arg_value=arg_value):
+                    with self.assertRaises(ValueError):
+                        uberjob.run(plan, **{arg_name: arg_value})
+
         with self.assertRaises(ValueError):
             uberjob.run(plan, max_errors=-1)
 

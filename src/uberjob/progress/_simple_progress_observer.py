@@ -17,8 +17,6 @@ import datetime as dt
 import threading
 import time
 from abc import ABC, abstractmethod
-from collections import defaultdict
-from contextlib import contextmanager
 from typing import Tuple
 
 from uberjob.progress._progress_observer import ProgressObserver
@@ -73,14 +71,16 @@ class ScopeState:
 
 
 class State:
-    def __init__(self):
-        self.section_scope_mapping = defaultdict(lambda: defaultdict(ScopeState))
+    def __init__(self, start_time):
+        self.section_scope_mapping = {}
         self.running_count = 0
         self._running_section_scopes = set()
-        self._prev_time = None
+        self._prev_time = start_time
 
     def increment_total(self, section, scope, amount: int):
-        self.section_scope_mapping[section][scope].total += amount
+        self.section_scope_mapping.setdefault(section, {}).setdefault(
+            scope, ScopeState()
+        ).total += amount
 
     def increment_running(self, section, scope):
         self.update_weighted_elapsed()
@@ -110,14 +110,12 @@ class State:
 
     def update_weighted_elapsed(self):
         t = time.time()
-        if self._prev_time:
+        if self.running_count:
             elapsed = t - self._prev_time
-            if self.running_count:
-                for section, scope in self._running_section_scopes:
-                    scope_state = self.section_scope_mapping[section][scope]
-                    scope_state.weighted_elapsed += (
-                        elapsed * scope_state.running / self.running_count
-                    )
+            multiplier = elapsed / self.running_count
+            for section, scope in self._running_section_scopes:
+                scope_state = self.section_scope_mapping[section][scope]
+                scope_state.weighted_elapsed += scope_state.running * multiplier
         self._prev_time = t
 
 
@@ -134,15 +132,14 @@ class SimpleProgressObserver(ProgressObserver, ABC):
         self._min_update_interval = min_update_interval
         self._max_update_interval = max_update_interval
         self._max_exception_count = max_exception_count
-        self._state = State()
-        self._running_scope_lookup = defaultdict(set)
         self._exception_tuples = []
         self._new_exception_index = 0
         self._lock = threading.Lock()
         self._stale = True
         self._done_event = threading.Event()
         self._thread = None
-        self._start_time = None
+        self._start_time = time.time()
+        self._state = State(self._start_time)
         self._last_render_time = None
 
     @abstractmethod
@@ -154,7 +151,6 @@ class SimpleProgressObserver(ProgressObserver, ABC):
         pass
 
     def __enter__(self):
-        self._start_time = time.time()
         self._thread = threading.Thread(target=self._run_update_thread)
         self._thread.start()
 
@@ -174,7 +170,7 @@ class SimpleProgressObserver(ProgressObserver, ABC):
             self._last_render_time = t
             self._state.update_weighted_elapsed()
             output_value = self._render(
-                self._state,
+                self._state.section_scope_mapping,
                 self._new_exception_index,
                 self._exception_tuples,
                 t - self._start_time,
@@ -196,26 +192,24 @@ class SimpleProgressObserver(ProgressObserver, ABC):
             if output_value is not None:
                 self._output(output_value)
 
-    @contextmanager
-    def _lock_and_make_stale(self):
+    def increment_total(self, *, section: str, scope: Tuple, amount: int):
         with self._lock:
             self._stale = True
-            yield
-
-    def increment_total(self, *, section: str, scope: Tuple, amount: int):
-        with self._lock_and_make_stale():
             self._state.increment_total(section, scope, amount)
 
     def increment_running(self, *, section: str, scope: Tuple):
-        with self._lock_and_make_stale():
+        with self._lock:
+            self._stale = True
             self._state.increment_running(section, scope)
 
     def increment_completed(self, *, section: str, scope: Tuple):
-        with self._lock_and_make_stale():
+        with self._lock:
+            self._stale = True
             self._state.increment_completed(section, scope)
 
     def increment_failed(self, *, section: str, scope: Tuple, exception: Exception):
-        with self._lock_and_make_stale():
+        with self._lock:
+            self._stale = True
             self._state.increment_failed(section, scope)
             if len(self._exception_tuples) < self._max_exception_count:
                 self._exception_tuples.append(

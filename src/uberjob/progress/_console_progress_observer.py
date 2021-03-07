@@ -81,7 +81,7 @@ class ConsoleProgressObserver(SimpleProgressObserver):
             print_ = partial(print, file=buffer)
             _print_header(print_, elapsed)
             for section in ("stale", "run"):
-                scope_mapping = state.section_scope_mapping.get(section)
+                scope_mapping = state.get(section)
                 if scope_mapping:
                     is_done = all(
                         s.completed + s.failed == s.total

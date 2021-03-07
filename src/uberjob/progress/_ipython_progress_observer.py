@@ -68,7 +68,7 @@ class IPythonProgressObserver(SimpleProgressObserver):
             ("stale", "Determining stale value stores"),
             ("run", "Running graph"),
         ):
-            scope_mapping = state.section_scope_mapping.get(section)
+            scope_mapping = state.get(section)
             if scope_mapping:
                 title_widget = self._get(
                     "section", section, "title", default=widgets.HTML

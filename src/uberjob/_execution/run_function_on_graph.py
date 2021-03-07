@@ -24,11 +24,11 @@ from uberjob._util.networkx_util import assert_acyclic, predecessor_count, sourc
 
 
 class NodeError(Exception):
-    """An exception was raised during _execution of a node."""
+    """An exception was raised during execution of a node."""
 
     def __init__(self, node):
         super().__init__(
-            f"An exception was raised during _execution of the following node: {node!r}."
+            f"An exception was raised during execution of the following node: {node!r}."
         )
         self.node = node
 
@@ -81,7 +81,7 @@ def worker_pool(queue, process_item, worker_count):
     try:
         for _ in range(worker_count):
             workers.append(worker_thread(queue, process_item))
-        yield queue.put
+        yield
     finally:
         for worker in workers:
             worker.join()
@@ -110,6 +110,8 @@ def run_function_on_graph(
     first_node_error = None
     error_count = 0
 
+    queue = create_queue(graph, source_nodes(graph), scheduler)
+
     def process_node(node):
         nonlocal stop
         nonlocal first_node_error
@@ -133,13 +135,10 @@ def run_function_on_graph(
                     remaining_predecessor_count.value -= 1
                     should_submit = remaining_predecessor_count.value == 0
                 if should_submit:
-                    submit(successor)
+                    queue.put(successor)
 
-    queue = create_queue(graph, scheduler)
-    with worker_pool(queue, process_node, worker_count) as submit:
+    with worker_pool(queue, process_node, worker_count):
         try:
-            for node in source_nodes(graph):
-                submit(node)
             queue.join()
         finally:
             stop = True

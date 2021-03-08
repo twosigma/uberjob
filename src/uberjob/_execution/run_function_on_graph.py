@@ -128,7 +128,7 @@ def run_function_on_graph(
     error_count = 0
     failure_lock = threading.Lock()
 
-    queue = create_queue(graph, source_nodes(graph), scheduler)
+    queue = create_queue(graph, source_nodes, scheduler)
 
     def process_node(node):
         nonlocal stop

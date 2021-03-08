@@ -182,6 +182,7 @@ def run(
     progress: Union[None, bool, Progress, Iterable[Progress]] = True,
     scheduler: Optional[str] = None,
     transform_physical: Optional[Callable[[Plan, Node], Tuple[Plan, Node]]] = None,
+    stale_check_max_workers: Optional[int] = None,
 ):
     """
     Run a :class:`~uberjob.Plan`.
@@ -211,6 +212,8 @@ def run(
     :param transform_physical: Optional transformation to be applied to the physical plan.
                                It takes ``(plan, output_node)`` as positional arguments and
                                returns ``(transformed_plan, redirected_output_node)``.
+    :param stale_check_max_workers: Optionally specify the maximum number of threads used for the stale check.
+                                    The default behavior is to use ``max_workers``.
     :return: The non-symbolic output corresponding to the symbolic output argument.
     """
     assert_is_instance(plan, "plan", Plan)
@@ -224,9 +227,16 @@ def run(
     assert_is_instance(max_workers, "max_workers", int, optional=True)
     if max_workers is not None and max_workers < 1:
         raise ValueError("max_workers must be at least 1.")
+    assert_is_instance(
+        stale_check_max_workers, "stale_check_max_workers", int, optional=True
+    )
+    if stale_check_max_workers is not None and stale_check_max_workers < 1:
+        raise ValueError("stale_check_max_workers must be at least 1.")
     assert_is_instance(max_errors, "max_errors", int, optional=True)
     if max_errors is not None and max_errors < 0:
         raise ValueError("max_errors must be nonnegative.")
+    if stale_check_max_workers is None:
+        stale_check_max_workers = max_workers
 
     plan = get_mutable_plan(plan, inplace=False)
 
@@ -246,7 +256,7 @@ def run(
                     registry,
                     output_node=output_node,
                     progress_observer=progress_observer,
-                    max_workers=max_workers,
+                    max_workers=stale_check_max_workers,
                     retry=retry,
                     fresh_time=fresh_time,
                     inplace=True,

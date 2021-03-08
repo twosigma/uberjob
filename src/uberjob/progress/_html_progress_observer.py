@@ -130,7 +130,7 @@ class HtmlProgressObserver(SimpleProgressObserver):
             ("stale", "Determining stale value stores"),
             ("run", "Running graph"),
         ):
-            scope_mapping = state.section_scope_mapping.get(section)
+            scope_mapping = state.get(section)
             if scope_mapping:
                 lines.append('<h3 class="mt-4">{}</h3>'.format(html.escape(title)))
                 for scope, scope_state in sorted_scope_items(scope_mapping):

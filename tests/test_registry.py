@@ -61,6 +61,7 @@ class RegistryTestCase(UberjobTestCase):
         uberjob.run(p, registry=r)
         self.assertEqual(r[x].read_count, 0)
         self.assertEqual(r[x].write_count, 1)
+        uberjob.run(p, registry=r, stale_check_max_workers=1)
 
     def test_pruning(self):
         p = uberjob.Plan()

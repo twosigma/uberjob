@@ -17,18 +17,19 @@
 import os
 import threading
 from contextlib import contextmanager
+from typing import Dict, List, NamedTuple, Set
 
 from uberjob._execution.scheduler import create_queue
-from uberjob._util import Slot
-from uberjob._util.networkx_util import assert_acyclic, predecessor_count, source_nodes
+from uberjob._util.networkx_util import assert_acyclic, predecessor_count
+from uberjob.graph import Node
 
 
 class NodeError(Exception):
-    """An exception was raised during _execution of a node."""
+    """An exception was raised during execution of a node."""
 
     def __init__(self, node):
         super().__init__(
-            f"An exception was raised during _execution of the following node: {node!r}."
+            f"An exception was raised during execution of the following node: {node!r}."
         )
         self.node = node
 
@@ -81,18 +82,33 @@ def worker_pool(queue, process_item, worker_count):
     try:
         for _ in range(worker_count):
             workers.append(worker_thread(queue, process_item))
-        yield queue.put
+        yield
     finally:
         for worker in workers:
             worker.join()
 
 
-class LockDict:
-    def __init__(self, lock_count):
-        self.locks = [threading.Lock() for _ in range(lock_count)]
+class PreparedNodes(NamedTuple):
+    source_nodes: List[Node]
+    single_parent_nodes: Set[Node]
+    remaining_pred_count_mapping: Dict[Node, int]
 
-    def __getitem__(self, key):
-        return self.locks[hash(key) % len(self.locks)]
+
+def prepare_nodes(graph) -> PreparedNodes:
+    source_nodes = []
+    single_parent_nodes = set()
+    remaining_pred_count_mapping = {}
+    for node in graph:
+        count = predecessor_count(graph, node)
+        if count == 0:
+            source_nodes.append(node)
+        elif count == 1:
+            single_parent_nodes.add(node)
+        else:
+            remaining_pred_count_mapping[node] = count
+    return PreparedNodes(
+        source_nodes, single_parent_nodes, remaining_pred_count_mapping
+    )
 
 
 def run_function_on_graph(
@@ -101,14 +117,18 @@ def run_function_on_graph(
     assert_acyclic(graph)
     worker_count = coerce_worker_count(worker_count)
     max_errors = coerce_max_errors(max_errors)
-    failure_lock = threading.Lock()
-    node_locks = LockDict(8)
-    remaining_predecessor_counts = {
-        node: Slot(predecessor_count(graph, node)) for node in graph
-    }
+
+    source_nodes, single_parent_nodes, remaining_pred_count_mapping = prepare_nodes(
+        graph
+    )
+    remaining_pred_count_lock = threading.Lock()
+
     stop = False
     first_node_error = None
     error_count = 0
+    failure_lock = threading.Lock()
+
+    queue = create_queue(graph, source_nodes, scheduler)
 
     def process_node(node):
         nonlocal stop
@@ -128,18 +148,16 @@ def run_function_on_graph(
                     stop = True
         else:
             for successor in graph.successors(node):
-                remaining_predecessor_count = remaining_predecessor_counts[successor]
-                with node_locks[successor]:
-                    remaining_predecessor_count.value -= 1
-                    should_submit = remaining_predecessor_count.value == 0
-                if should_submit:
-                    submit(successor)
+                if successor in single_parent_nodes:
+                    queue.put(successor)
+                else:
+                    with remaining_pred_count_lock:
+                        remaining_pred_count_mapping[successor] -= 1
+                        if remaining_pred_count_mapping[successor] == 0:
+                            queue.put(successor)
 
-    queue = create_queue(graph, scheduler)
-    with worker_pool(queue, process_node, worker_count) as submit:
+    with worker_pool(queue, process_node, worker_count):
         try:
-            for node in source_nodes(graph):
-                submit(node)
             queue.join()
         finally:
             stop = True

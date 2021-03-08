@@ -65,8 +65,7 @@ class Registry:
         validation.assert_is_instance(plan, "plan", Plan)
         validation.assert_is_instance(value_store, "value_store", ValueStore)
         stack_frame = get_stack_frame()
-        node = plan.call(source)
-        node.stack_frame = stack_frame
+        node = plan._call(stack_frame, source)
         self.mapping[node] = RegistryValue(
             value_store, is_source=True, stack_frame=stack_frame
         )

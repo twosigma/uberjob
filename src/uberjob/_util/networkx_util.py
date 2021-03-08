@@ -38,12 +38,6 @@ def predecessor_count(graph, node) -> int:
     return len(graph.pred[node])
 
 
-def source_nodes(graph):
-    for node, predecessors in graph.pred.items():
-        if not predecessors:
-            yield node
-
-
 def is_source_node(graph, node) -> bool:
     return not graph.pred[node]
 

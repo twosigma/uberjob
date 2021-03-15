@@ -112,7 +112,7 @@ def _get_stale_nodes(
                     exception=created_chained_call_error(node, exception),
                 )
                 raise
-            progress_observer.increment_completed(section="stale, scope=scope")
+            progress_observer.increment_completed(section="stale", scope=scope)
         else:
             process(node)
 

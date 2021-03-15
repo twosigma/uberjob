@@ -16,12 +16,16 @@
 """Functionality for executing a physical plan"""
 from typing import Any, Callable, Dict, NamedTuple, Optional
 
+from uberjob._errors import created_chained_call_error
 from uberjob._execution.run_function_on_graph import run_function_on_graph
+from uberjob._graph import get_full_scope
 from uberjob._plan import Plan
 from uberjob._transformations.pruning import prune_source_literals
 from uberjob._util import Slot
 from uberjob._util.retry import identity
 from uberjob.graph import Call, Graph, Literal, Node, get_argument_nodes
+from uberjob.progress._null_progress_observer import NullProgressObserver
+from uberjob.progress._progress_observer import ProgressObserver
 
 
 class BoundCall:
@@ -74,42 +78,38 @@ class PrepRunPhysical(NamedTuple):
     plan: Plan
 
 
-def _default_on_failed(node: Node, e: Exception):
-    pass
-
-
 def prep_run_physical(
     plan: Plan,
     *,
     inplace: bool,
     output_node: Optional[Node] = None,
     retry: Optional[Callable[[Callable], Callable]] = None,
-    on_started: Optional[Callable[[Node], None]] = None,
-    on_completed: Optional[Callable[[Node], None]] = None,
-    on_failed: Optional[Callable[[Node, Exception], None]] = None,
+    progress_observer: Optional[ProgressObserver] = None,
 ):
     bound_call_lookup, output_slot = _create_bound_call_lookup_and_output_slot(
         plan, output_node
     )
     plan = prune_source_literals(plan, inplace=inplace)
-    on_started = on_started or identity
-    on_completed = on_completed or identity
-    on_failed = on_failed or _default_on_failed
     retry = retry or identity
+    progress_observer = progress_observer or NullProgressObserver()
 
     def process(node):
         if type(node) is Call:
-            on_started(node)
+            scope = get_full_scope(plan.graph, node)
+            progress_observer.increment_running(section="run", scope=scope)
             bound_call = bound_call_lookup[node]
             try:
                 retry(bound_call.value.run)()
-            except Exception as e:
-                on_failed(node, e)
+            except Exception as exception:
+                progress_observer.increment_failed(
+                    section="run",
+                    scope=scope,
+                    exception=created_chained_call_error(node, exception),
+                )
                 raise
             finally:
                 bound_call.value = None
-
-            on_completed(node)
+            progress_observer.increment_completed(section="run", scope=scope)
 
     return PrepRunPhysical(bound_call_lookup, output_slot, process, plan)
 
@@ -123,18 +123,14 @@ def run_physical(
     max_workers: Optional[int] = None,
     max_errors: Optional[int] = 0,
     scheduler: Optional[str] = None,
-    on_started: Optional[Callable[[Node], None]] = None,
-    on_completed: Optional[Callable[[Node], None]] = None,
-    on_failed: Optional[Callable[[Node, Exception], None]] = None,
+    progress_observer: ProgressObserver,
 ) -> Any:
     _, output_slot, process, plan = prep_run_physical(
         plan,
         output_node=output_node,
         retry=retry,
         inplace=inplace,
-        on_started=on_started,
-        on_completed=on_completed,
-        on_failed=on_failed,
+        progress_observer=progress_observer,
     )
 
     run_function_on_graph(

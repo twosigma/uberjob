@@ -38,7 +38,7 @@ from uberjob.progress import (
 )
 
 
-def _update_run_totals(plan: Plan, progress_observer: ProgressObserver):
+def _update_run_totals(plan: Plan, progress_observer: ProgressObserver) -> None:
     scope_counts = collections.Counter(
         get_full_scope(plan.graph, node)
         for node in plan.graph.nodes()

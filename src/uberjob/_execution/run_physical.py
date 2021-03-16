@@ -16,7 +16,7 @@
 """Functionality for executing a physical plan"""
 from typing import Any, Callable, Dict, NamedTuple, Optional
 
-from uberjob._errors import created_chained_call_error
+from uberjob._errors import create_chained_call_error
 from uberjob._execution.run_function_on_graph import run_function_on_graph
 from uberjob._graph import get_full_scope
 from uberjob._plan import Plan
@@ -104,7 +104,7 @@ def prep_run_physical(
                 progress_observer.increment_failed(
                     section="run",
                     scope=scope,
-                    exception=created_chained_call_error(node, exception),
+                    exception=create_chained_call_error(node, exception),
                 )
                 raise
             finally:

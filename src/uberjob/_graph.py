@@ -13,10 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+from typing import Tuple
+
 from uberjob.graph import Graph, Node
 
 
-def get_full_scope(graph: Graph, node: Node):
+def get_full_scope(graph: Graph, node: Node) -> Tuple:
     node_data = graph.nodes[node]
     return node_data["scope"] + node_data.get("implicit_scope", ())
 

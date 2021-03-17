@@ -39,3 +39,12 @@ class CallError(Exception):
 
 class NotTransformedError(Exception):
     """An expected transformation was not applied."""
+
+
+def create_chained_call_error(call: Call, exception: Exception) -> CallError:
+    call_error = CallError(call)
+    call_error.__cause__ = exception
+    return call_error
+
+
+__all__ = ["CallError", "NotTransformedError", "create_chained_call_error"]

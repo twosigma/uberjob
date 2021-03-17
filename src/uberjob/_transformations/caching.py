@@ -13,16 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import collections
 import datetime as dt
-from typing import Callable, Optional, Set, Tuple
+from typing import Optional, Set, Tuple
 
+from uberjob._errors import create_chained_call_error
 from uberjob._execution.run_function_on_graph import run_function_on_graph
+from uberjob._graph import get_full_scope
 from uberjob._plan import Plan
 from uberjob._registry import Registry, RegistryValue
 from uberjob._transformations import get_mutable_plan
 from uberjob._transformations.pruning import prune_plan, prune_source_literals
-from uberjob._util import Slot, safe_max
+from uberjob._util import Slot, fully_qualified_name, safe_max
 from uberjob.graph import Call, Dependency, KeywordArg, Node, PositionalArg, get_scope
+from uberjob.progress._progress_observer import ProgressObserver
 
 
 class BarrierType:
@@ -39,6 +43,14 @@ def _to_naive_local_timezone(value: Optional[dt.datetime]) -> Optional[dt.dateti
     return value.astimezone().replace(tzinfo=None) if value and value.tzinfo else value
 
 
+def _get_stale_scope(node: Node, plan: Plan, registry: Registry) -> Tuple:
+    scope = get_full_scope(plan.graph, node)
+    value_store = registry.get(node)
+    if value_store is None:
+        return scope
+    return (*scope, fully_qualified_name(value_store.__class__))
+
+
 def _get_stale_nodes(
     plan: Plan,
     registry: Registry,
@@ -46,8 +58,7 @@ def _get_stale_nodes(
     retry,
     max_workers: Optional[int] = None,
     fresh_time: Optional[dt.datetime] = None,
-    on_started: Optional[Callable[[Node], None]] = None,
-    on_completed: Optional[Callable[[Node], None]] = None
+    progress_observer: ProgressObserver,
 ) -> Set[Node]:
     plan = prune_source_literals(
         plan, inplace=False, predicate=lambda node: node not in registry
@@ -89,13 +100,21 @@ def _get_stale_nodes(
             process_no_stale_ancestor(node)
 
     def process_with_callbacks(node):
-        if on_started is not None and type(node) is Call:
-            on_started(node)
-        try:
+        if type(node) is Call:
+            scope = _get_stale_scope(node, plan, registry)
+            progress_observer.increment_running(section="stale", scope=scope)
+            try:
+                process(node)
+            except Exception as exception:
+                progress_observer.increment_failed(
+                    section="stale",
+                    scope=scope,
+                    exception=create_chained_call_error(node, exception),
+                )
+                raise
+            progress_observer.increment_completed(section="stale", scope=scope)
+        else:
             process(node)
-        finally:
-            if on_completed is not None and type(node) is Call:
-                on_completed(node)
 
     run_function_on_graph(
         plan.graph, process_with_callbacks, worker_count=max_workers, scheduler="cheap"
@@ -145,6 +164,18 @@ def _add_value_store(
     return write_node, read_node
 
 
+def _update_stale_totals(
+    plan: Plan, registry: Registry, progress_observer: ProgressObserver
+) -> None:
+    scope_counts = collections.Counter(
+        _get_stale_scope(node, plan, registry)
+        for node in plan.graph.nodes()
+        if type(node) is Call
+    )
+    for scope, count in scope_counts.items():
+        progress_observer.increment_total(section="stale", scope=scope, amount=count)
+
+
 def plan_with_value_stores(
     plan: Plan,
     registry: Registry,
@@ -154,9 +185,9 @@ def plan_with_value_stores(
     retry,
     fresh_time: Optional[dt.datetime] = None,
     inplace: bool,
-    on_started: Optional[Callable[[Node], None]] = None,
-    on_completed: Optional[Callable[[Node], None]] = None
+    progress_observer,
 ) -> Tuple[Plan, Optional[Node]]:
+    _update_stale_totals(plan, registry, progress_observer)
     plan = get_mutable_plan(plan, inplace=inplace)
     stale_nodes = _get_stale_nodes(
         plan,
@@ -164,8 +195,7 @@ def plan_with_value_stores(
         max_workers=max_workers,
         retry=retry,
         fresh_time=fresh_time,
-        on_started=on_started,
-        on_completed=on_completed,
+        progress_observer=progress_observer,
     )
     read_node_lookup = {}
     required_nodes = set()

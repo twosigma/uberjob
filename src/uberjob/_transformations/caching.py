@@ -39,8 +39,12 @@ class BarrierType:
 Barrier = BarrierType()
 
 
-def _to_naive_local_timezone(value: Optional[dt.datetime]) -> Optional[dt.datetime]:
-    return value.astimezone().replace(tzinfo=None) if value and value.tzinfo else value
+def _to_naive_utc_time(value: Optional[dt.datetime]) -> Optional[dt.datetime]:
+    return (
+        value.astimezone(dt.timezone.utc).replace(tzinfo=None)
+        if value and value.tzinfo
+        else value
+    )
 
 
 def _get_stale_scope(node: Node, plan: Plan, registry: Registry) -> Tuple:
@@ -63,7 +67,7 @@ def _get_stale_nodes(
     plan = prune_source_literals(
         plan, inplace=False, predicate=lambda node: node not in registry
     )
-    fresh_time = _to_naive_local_timezone(fresh_time)
+    fresh_time = _to_naive_utc_time(fresh_time)
     stale_lookup = {node: Slot(False) for node in plan.graph.nodes()}
     modified_time_lookup = {node: Slot() for node in plan.graph.nodes()}
 
@@ -76,7 +80,7 @@ def _get_stale_nodes(
         if value_store is None:
             modified_time_lookup[node].value = max_ancestor_modified_time
             return
-        modified_time = _to_naive_local_timezone(retry(value_store.get_modified_time)())
+        modified_time = _to_naive_utc_time(retry(value_store.get_modified_time)())
         if modified_time is None:
             stale_lookup[node].value = True
             return

@@ -190,7 +190,7 @@ class PlanTestCase(UberjobTestCase):
         plan2 = uberjob.Plan()
         x = plan1.lit(1)
         y = plan2.lit(2)
-        with self.assertRaisesRegex(Exception, re.escape("does not contain the node")):
+        with self.assertRaisesRegex(KeyError, re.escape("does not contain the node")):
             plan1.add_dependency(x, y)
 
     def test_schedulers(self):

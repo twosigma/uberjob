@@ -110,7 +110,7 @@ class Plan:
         validation.assert_is_instance(target, "target", Node)
         for node in (source, target):
             if not self.graph.has_node(node):
-                raise Exception(f"The plan graph does not contain the node {node!r}.")
+                raise KeyError(f"The plan graph does not contain the node {node!r}.")
         self.graph.add_edge(source, target, Dependency())
 
     def _gather(self, stack_frame, value) -> Node:

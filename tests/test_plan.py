@@ -89,6 +89,14 @@ class PlanTestCase(UberjobTestCase):
         self.assertEqual(uberjob.run(p, output=[]), [])
         self.assertEqual(uberjob.run(p, output=dict()), dict())
 
+    def test_latest_key_wins_in_dict_collisions(self):
+        p = uberjob.Plan()
+        x = {"a": 1, "b": 2, "c": 3}
+        x[p.lit("b")] = 4
+        x[p.lit("a")] = 5
+        self.assertEqual(len(x), 5)  # Because, e.g., "a" is not lit("a")
+        self.assertEqual(uberjob.run(p, output=x), {"a": 5, "b": 4, "c": 3})
+
     def test_stack_frame_function(self):
         stack_frame1 = get_stack_frame(1)
         stack_frame2 = get_stack_frame(1)
@@ -182,7 +190,7 @@ class PlanTestCase(UberjobTestCase):
         plan2 = uberjob.Plan()
         x = plan1.lit(1)
         y = plan2.lit(2)
-        with self.assertRaisesRegex(Exception, re.escape("does not contain the node")):
+        with self.assertRaisesRegex(KeyError, re.escape("does not contain the node")):
             plan1.add_dependency(x, y)
 
     def test_schedulers(self):

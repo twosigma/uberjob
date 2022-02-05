@@ -29,7 +29,7 @@ values are stored.
 __author__ = "Daniel Shields, Timothy Shields"
 __maintainer__ = "Daniel Shields, Timothy Shields"
 __email__ = "Daniel.Shields@twosigma.com, Timothy.Shields@twosigma.com"
-__version__ = "0.1.0"
+__version__ = "1.0.0"
 
 from uberjob import graph, progress, stores
 from uberjob._errors import CallError, NotTransformedError

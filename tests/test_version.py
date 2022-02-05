@@ -18,7 +18,7 @@ import re
 
 import uberjob
 
-EXPECTED_VERSION = "0.1.0"
+EXPECTED_VERSION = "1.0.0"
 REPOSITORY_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 

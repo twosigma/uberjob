@@ -325,7 +325,7 @@ class RegistryTestCase(UberjobTestCase):
         registry = uberjob.Registry()
         x = plan.call(operator.add, 1, 2)
         registry.add(x, TestStore())
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegex(Exception, r"The node already has a value store\."):
             registry.add(x, TestStore())
 
     def test_registry_copy(self):

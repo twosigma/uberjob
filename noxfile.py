@@ -29,7 +29,8 @@ def install_with_constraints(session, *args, **kwargs):
         session.run(
             "poetry",
             "export",
-            "--dev",
+            "--with",
+            "dev",
             "--without-hashes",
             "--format=requirements.txt",
             f"--output={requirements}",

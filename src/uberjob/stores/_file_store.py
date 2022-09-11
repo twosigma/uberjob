@@ -97,6 +97,8 @@ class FileStore(ValueStore, ABC):
     :param path: The path.
     """
 
+    __slots__ = ("path",)
+
     def __init__(self, path: Union[str, pathlib.Path]):
         self.path = path
 

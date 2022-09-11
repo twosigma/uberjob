@@ -29,6 +29,8 @@ class ModifiedTimeSource(ValueStore):
     :param modified_time: The modified time.
     """
 
+    __slots__ = ("modified_time",)
+
     def __init__(self, modified_time: typing.Optional[dt.datetime]):
         if modified_time is not None and not isinstance(modified_time, dt.datetime):
             raise TypeError("The modified_time must be a datetime or None.")

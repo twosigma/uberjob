@@ -23,6 +23,8 @@ class BinaryFileStore(FileStore):
     :param path: The path.
     """
 
+    __slots__ = ()
+
     def read(self) -> bytes:
         """Read the binary value from the file."""
         with open(self.path, mode="rb") as inputfile:

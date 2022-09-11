@@ -25,6 +25,8 @@ class TouchFileStore(FileStore):
     :param path: The path.
     """
 
+    __slots__ = ()
+
     def read(self):
         """Return ``None`` after ensuring that the touch file exists and is empty."""
         with open(self.path, "rb") as inputfile:

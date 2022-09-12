@@ -36,6 +36,8 @@ class MountedStore(ValueStore, ABC):
     :param create_store: A callable that creates a :class:`~uberjob.ValueStore` for a path.
     """
 
+    __slots__ = ("create_store",)
+
     def __init__(self, create_store: typing.Callable[[str], ValueStore]):
         self.create_store = create_store
         """Creates an instance of the underlying :class:`~uberjob.ValueStore` for the given path."""

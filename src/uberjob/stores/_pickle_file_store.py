@@ -25,6 +25,8 @@ class PickleFileStore(FileStore):
     :param path: The path.
     """
 
+    __slots__ = ()
+
     def read(self):
         """Read the pickled value from the file."""
         with open(self.path, "rb") as inputfile:

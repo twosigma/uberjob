@@ -29,6 +29,8 @@ class JsonFileStore(FileStore):
     :param encoding: The name of the encoding used to decode or encode the file.
     """
 
+    __slots__ = ("encoding",)
+
     def __init__(
         self,
         path: typing.Union[str, pathlib.Path],

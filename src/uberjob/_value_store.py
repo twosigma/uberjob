@@ -21,6 +21,8 @@ from abc import ABC, abstractmethod
 class ValueStore(ABC):
     """The abstract base class for all value stores."""
 
+    __slots__ = ()
+
     @abstractmethod
     def read(self):
         """Read the value from the store."""

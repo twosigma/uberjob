@@ -31,6 +31,8 @@ class PathSource(ValueStore):
                      return ``None``.
     """
 
+    __slots__ = ("path", "required")
+
     def __init__(self, path: typing.Union[str, pathlib.Path], *, required: bool = True):
         self.path = path
         self.required = required

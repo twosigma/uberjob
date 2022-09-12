@@ -29,6 +29,8 @@ class LiteralSource(ValueStore):
     :param modified_time: The modified time.
     """
 
+    __slots__ = ("value", "modified_time")
+
     def __init__(self, value, modified_time: typing.Optional[dt.datetime]):
         self.value = value
         self.modified_time = modified_time

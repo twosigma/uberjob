@@ -178,8 +178,8 @@ class HtmlProgressObserver(SimpleProgressObserver):
                                      role="progressbar" style="width:{failure_indicator}%"></div>
                             </div>
                         </td>
-                        <td> class="text-right">{progress_string}</td>
-                        <td> class="text-right">{elapsed_string}</td>
+                        <td class="text-right">{progress_string}</td>
+                        <td class="text-right">{elapsed_string}</td>
                         <td>{scope_string}</td>
                     </tr>
                     """.format(

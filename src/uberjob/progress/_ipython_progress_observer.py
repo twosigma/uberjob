@@ -19,6 +19,7 @@ import traceback
 
 from uberjob.progress._simple_progress_observer import (
     SimpleProgressObserver,
+    get_elapsed_string,
     get_scope_string,
     sorted_scope_items,
 )
@@ -54,13 +55,13 @@ class IPythonProgressObserver(SimpleProgressObserver):
 
         elapsed_widget = self._get("elapsed", default=lambda: widgets.Label())
         elapsed_widget.value = "elapsed {}; updated {}".format(
-            dt.timedelta(seconds=int(elapsed)),
+            get_elapsed_string(elapsed),
             dt.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
         )
         hbox_widget = self._get("title_hbox", default=widgets.HBox)
         hbox_widget.layout.align_items = "baseline"
         hbox_widget.children = [
-            self._get("title", default=lambda: widgets.HTML("<h2>\u00FCberjob</h2>")),
+            self._get("title", default=lambda: widgets.HTML("<h2>uberjob</h2>")),
             elapsed_widget,
         ]
         children = [hbox_widget]
@@ -101,8 +102,9 @@ class IPythonProgressObserver(SimpleProgressObserver):
                         "label",
                         default=widgets.Label,
                     )
-                    label_widget.value = "{}; {}".format(
+                    label_widget.value = "{}; {}; {}".format(
                         scope_state.to_progress_string(),
+                        scope_state.to_elapsed_string(),
                         get_scope_string(scope, add_zero_width_spaces=True),
                     )
                     hbox_widget = self._get(

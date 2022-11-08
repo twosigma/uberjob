@@ -21,6 +21,7 @@ from typing import Callable, Union
 
 from uberjob.progress._simple_progress_observer import (
     SimpleProgressObserver,
+    get_elapsed_string,
     get_scope_string,
     sorted_scope_items,
 )
@@ -31,8 +32,8 @@ TEMPLATE = """\
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>\u00FCberjob</title>
-        <meta name="description" contents="\u00FCberjob">
+        <title>uberjob</title>
+        <meta name="description" contents="uberjob">
         <link rel="stylesheet"
               href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.2.1/css/bootstrap.min.css"
               integrity="sha256-azvvU9xKluwHFJ0Cpgtf0CYzK7zgtOznnzxV4924X1w="
@@ -117,9 +118,9 @@ class HtmlProgressObserver(SimpleProgressObserver):
     def _render(self, state, new_exception_index, exception_tuples, elapsed):
         lines = [
             '<div class="d-flex mt-4 align-items-end">',
-            '  <div class="mr-auto"><h1>\u00FCberjob</h1></div>',
+            '  <div class="mr-auto"><h1>uberjob</h1></div>',
             '  <div class="mr-4"><h6>Elapsed {}</h6></div>'.format(
-                html.escape(str(dt.timedelta(seconds=int(elapsed))))
+                html.escape(get_elapsed_string(elapsed))
             ),
             "  <div><h6>Updated {}</h6></div>".format(
                 html.escape(dt.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"))
@@ -133,6 +134,20 @@ class HtmlProgressObserver(SimpleProgressObserver):
             scope_mapping = state.get(section)
             if scope_mapping:
                 lines.append('<h3 class="mt-4">{}</h3>'.format(html.escape(title)))
+                lines.append(
+                    """\
+                    <table class="table table-sm table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col" style="width: 10%"></th>
+                                <th scope="col" class="text-right">Progress</th>
+                                <th scope="col" class="text-right">Elapsed</th>
+                                <th scope="col">Scope</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                    """
+                )
                 for scope, scope_state in sorted_scope_items(scope_mapping):
                     completed_percentage = (
                         100 * scope_state.completed / scope_state.total
@@ -150,10 +165,8 @@ class HtmlProgressObserver(SimpleProgressObserver):
                     )
                     lines.append(
                         """\
-                    <div class="row align-items-center pt-1 pb-1 ml-0 mr-0 border">
-                        <div class="col"><samp>{scope_string}</samp></div>
-                        <div class="col-2 text-right">{progress_string}</div>
-                        <div class="col-3">
+                    <tr>
+                        <td>
                             <div class="progress">
                                 <div class="progress-bar {completed_class}"
                                      role="progressbar" style="width:{completed}%"></div>
@@ -164,12 +177,16 @@ class HtmlProgressObserver(SimpleProgressObserver):
                                 <div class="progress-bar bg-secondary"
                                      role="progressbar" style="width:{failure_indicator}%"></div>
                             </div>
-                        </div>
-                    </div>
+                        </td>
+                        <td class="text-right">{progress_string}</td>
+                        <td class="text-right">{elapsed_string}</td>
+                        <td>{scope_string}</td>
+                    </tr>
                     """.format(
                             progress_string=html.escape(
                                 scope_state.to_progress_string()
                             ),
+                            elapsed_string=html.escape(scope_state.to_elapsed_string()),
                             scope_string=html.escape(
                                 get_scope_string(scope, add_zero_width_spaces=True)
                             ),
@@ -182,6 +199,12 @@ class HtmlProgressObserver(SimpleProgressObserver):
                             else "",
                         )
                     )
+                lines.append(
+                    """\
+                        </tbody>
+                    </table>
+                    """
+                )
 
         if exception_tuples:
             lines.extend(_get_exception_lines(exception_tuples))

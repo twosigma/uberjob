@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import datetime as dt
 import threading
 import time
 from abc import ABC, abstractmethod
@@ -37,7 +36,7 @@ def get_scope_string(scope, *, add_zero_width_spaces=False):
     return scope_string
 
 
-def _get_progress_string(*, completed, failed, running, total, weighted_elapsed):
+def _get_progress_string(*, completed, failed, running, total):
     all_done = completed + failed == total
     started = completed + failed + running > 0
     if all_done or not started:
@@ -45,11 +44,20 @@ def _get_progress_string(*, completed, failed, running, total, weighted_elapsed)
     else:
         progress_string = f"({completed} + {running}) / {total}"
     if failed:
-        progress_string = f"{progress_string}; {failed} failed"
-    weighted_elapsed = int(weighted_elapsed)
-    if weighted_elapsed:
-        progress_string = f"{progress_string}; {dt.timedelta(seconds=weighted_elapsed)}"
+        progress_string = f"{progress_string}, {failed} failed"
     return progress_string
+
+
+def get_elapsed_string(elapsed: float) -> str:
+    elapsed = int(elapsed)
+    total_hours = elapsed // 3600
+    minutes = (elapsed % 3600) // 60
+    seconds = elapsed % 60
+    if total_hours:
+        return f"{total_hours}h{minutes:02}m{seconds:02}s"
+    if minutes:
+        return f"{minutes}m{seconds:02}s"
+    return f"{seconds}s"
 
 
 class ScopeState:
@@ -66,8 +74,10 @@ class ScopeState:
             failed=self.failed,
             running=self.running,
             total=self.total,
-            weighted_elapsed=self.weighted_elapsed,
         )
+
+    def to_elapsed_string(self):
+        return get_elapsed_string(self.weighted_elapsed)
 
 
 class State:

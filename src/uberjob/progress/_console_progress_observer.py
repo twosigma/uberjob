@@ -46,10 +46,10 @@ def _print_section(print_, section, scope_mapping):
     scope_items = sorted_scope_items(scope_mapping)
     print_("{}:".format(section))
     progress_strs = _ralign(
-        scope_state.to_progress_strings() for scope, scope_state in scope_items
+        scope_state.to_progress_string() for scope, scope_state in scope_items
     )
     elapsed_strs = _ralign(
-        scope_state.to_elapsed_strings() for scope, scope_state in scope_items
+        scope_state.to_elapsed_string() for scope, scope_state in scope_items
     )
     for progress_str, elapsed_str, (scope, _scope_state) in zip(
         progress_strs, elapsed_strs, scope_items

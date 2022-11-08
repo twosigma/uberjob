@@ -21,6 +21,7 @@ from io import StringIO
 
 from uberjob.progress._simple_progress_observer import (
     SimpleProgressObserver,
+    get_elapsed_string,
     get_scope_string,
     sorted_scope_items,
 )
@@ -28,37 +29,50 @@ from uberjob.progress._simple_progress_observer import (
 
 def _print_header(print_, elapsed):
     print_(
-        "uberjob; elapsed {}; updated {}".format(
-            dt.timedelta(seconds=int(elapsed)),
+        "uberjob, elapsed {}, updated {}".format(
+            get_elapsed_string(elapsed),
             dt.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
         )
     )
 
 
+def _ralign(strings):
+    strings = list(strings)
+    max_length = max(len(s) for s in strings)
+    return [s.rjust(max_length) for s in strings]
+
+
 def _print_section(print_, section, scope_mapping):
-    print_("  {}:".format(section))
-    for scope, scope_state in sorted_scope_items(scope_mapping):
+    scope_items = sorted_scope_items(scope_mapping)
+    print_("{}:".format(section))
+    progress_strs = _ralign(
+        scope_state.to_progress_strings() for scope, scope_state in scope_items
+    )
+    elapsed_strs = _ralign(
+        scope_state.to_elapsed_strings() for scope, scope_state in scope_items
+    )
+    for progress_str, elapsed_str, (scope, _scope_state) in zip(
+        progress_strs, elapsed_strs, scope_items
+    ):
         print_(
-            "    {}; {}".format(
-                scope_state.to_progress_string(), get_scope_string(scope)
-            )
+            "  {} | {} | {}".format(progress_str, elapsed_str, get_scope_string(scope))
         )
 
 
 def _print_new_exceptions(print_, new_exception_index, exception_tuples):
     if new_exception_index < len(exception_tuples):
-        print_("\n  new exceptions:")
+        print_("new exceptions:")
         for exception_index in range(new_exception_index, len(exception_tuples)):
             scope, exception_tuple = exception_tuples[exception_index]
             print_(
-                "    exception {}; {}".format(
+                "  exception {}; {}".format(
                     exception_index + 1, get_scope_string(scope)
                 )
             )
             print_(
                 textwrap.indent(
                     "".join(traceback.format_exception(*exception_tuple)),
-                    prefix=" " * 6,
+                    prefix=" " * 4,
                 )
             )
 

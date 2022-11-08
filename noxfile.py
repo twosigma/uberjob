@@ -43,7 +43,6 @@ def install_with_constraints(session, *args, **kwargs):
 def black(session):
     """Run black code formatter."""
     args = session.posargs or SOURCES
-    install_with_constraints(session, "black", "isort")
     session.run("isort", *args)
     session.run("black", *args)
 
@@ -67,7 +66,6 @@ def tests(session):
 @nox.session()
 def coverage(session):
     """Upload coverage data."""
-    install_with_constraints(session, "coverage", "codecov")
     session.run("coverage", "xml", "--fail-under=0")
     session.run("codecov", *session.posargs)
 

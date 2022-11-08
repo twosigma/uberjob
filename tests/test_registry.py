@@ -153,7 +153,7 @@ class RegistryTestCase(UberjobTestCase):
         self.assertEqual(store_a.read_count, 1)
         self.assertEqual(store_c.read_count, 0)
         self.assertEqual(store_c.write_count, 1)
-        self.assertGreater(store_c.modified_time, store_a.modified_time)
+        self.assertGreaterEqual(store_c.modified_time, store_a.modified_time)
         uberjob.run(p, registry=r, fresh_time=store_c.modified_time)
         self.assertEqual(store_a.read_count, 1)
         self.assertEqual(store_c.read_count, 0)

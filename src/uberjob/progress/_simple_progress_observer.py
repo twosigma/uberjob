@@ -96,7 +96,7 @@ class State:
         self.update_weighted_elapsed()
         scope_state = self.section_scope_mapping[section][scope]
         if not scope_state.running:
-            self._running_section_scopes.add((section, scope))
+            self._running_section_scopes.add(scope_state)
         scope_state.running += 1
         self.running_count += 1
 
@@ -106,7 +106,7 @@ class State:
         scope_state.running -= 1
         self.running_count -= 1
         if not scope_state.running:
-            self._running_section_scopes.remove((section, scope))
+            self._running_section_scopes.remove(scope_state)
         scope_state.completed += 1
 
     def increment_failed(self, section, scope):
@@ -115,7 +115,7 @@ class State:
         scope_state.running -= 1
         self.running_count -= 1
         if not scope_state.running:
-            self._running_section_scopes.remove((section, scope))
+            self._running_section_scopes.remove(scope_state)
         scope_state.failed += 1
 
     def update_weighted_elapsed(self):
@@ -123,8 +123,7 @@ class State:
         if self.running_count:
             elapsed = t - self._prev_time
             multiplier = elapsed / self.running_count
-            for section, scope in self._running_section_scopes:
-                scope_state = self.section_scope_mapping[section][scope]
+            for scope_state in self._running_section_scopes:
                 scope_state.weighted_elapsed += scope_state.running * multiplier
         self._prev_time = t
 

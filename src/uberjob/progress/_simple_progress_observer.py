@@ -95,8 +95,7 @@ class State:
     def increment_running(self, section, scope):
         self.update_weighted_elapsed()
         scope_state = self.section_scope_mapping[section][scope]
-        if not scope_state.running:
-            self._running_section_scopes.add(scope_state)
+        self._running_section_scopes.add(scope_state)
         scope_state.running += 1
         self.running_count += 1
 

@@ -27,10 +27,13 @@ Graph = nx.MultiDiGraph
 class Node:
     """A symbolic value in a call :class:`~uberjob.graph.Graph`."""
 
-    __slots__ = ()
+    __slots__ = ("scope",)
+
+    def __init__(self, *, scope=()):
+        self.scope = scope
 
     def __repr__(self):
-        return repr_helper(self)
+        return repr_helper(self, scope=self.scope, defaults={"scope": ()})
 
 
 class Literal(Node):
@@ -42,11 +45,12 @@ class Literal(Node):
 
     __slots__ = ("value",)
 
-    def __init__(self, value):
+    def __init__(self, value, *, scope=()):
         self.value = value
+        super().__init__(scope=scope)
 
     def __repr__(self):
-        return repr_helper(self, self.value)
+        return repr_helper(self, self.value, scope=self.scope, defaults={"scope": ()})
 
 
 class Call(Node):
@@ -59,16 +63,18 @@ class Call(Node):
 
     __slots__ = ("fn", "stack_frame")
 
-    def __init__(self, fn: Callable, *, stack_frame=None):
+    def __init__(self, fn: Callable, *, scope=(), stack_frame=None):
         self.fn = fn
         self.stack_frame = stack_frame
+        super().__init__(scope=scope)
 
     def __repr__(self):
         return repr_helper(
             self,
             self.fn,
+            scope=self.scope,
             stack_frame=Omitted if self.stack_frame else None,
-            defaults={"stack_frame": None},
+            defaults={"scope": (), "stack_frame": None},
         )
 
 
@@ -166,16 +172,6 @@ def get_argument_nodes(graph: Graph, call: Call) -> Tuple[List[Node], Dict[str, 
     return args, dict(keyword_arg_pairs)
 
 
-def get_scope(graph: Graph, node: Node) -> Tuple:
-    """
-    Return the scope of the given :class:`~uberjob.graph.Node`.
-
-    :param graph: The graph.
-    :param node: The node.
-    """
-    return graph.nodes[node]["scope"]
-
-
 __all__ = [
     "Graph",
     "Node",
@@ -185,5 +181,4 @@ __all__ = [
     "PositionalArg",
     "KeywordArg",
     "get_argument_nodes",
-    "get_scope",
 ]

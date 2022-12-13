@@ -19,7 +19,7 @@ from typing import Optional, Set, Tuple
 
 from uberjob._errors import create_chained_call_error
 from uberjob._execution.run_function_on_graph import run_function_on_graph
-from uberjob._graph import get_full_scope
+from uberjob._graph import get_full_call_scope
 from uberjob._plan import Plan
 from uberjob._registry import Registry, RegistryValue
 from uberjob._transformations import get_mutable_plan
@@ -47,9 +47,9 @@ def _to_naive_utc_time(value: Optional[dt.datetime]) -> Optional[dt.datetime]:
     )
 
 
-def _get_stale_scope(node: Node, plan: Plan, registry: Registry) -> Tuple:
-    scope = get_full_scope(plan.graph, node)
-    value_store = registry.get(node)
+def _get_stale_scope(call: Call, registry: Registry) -> Tuple:
+    scope = get_full_call_scope(call)
+    value_store = registry.get(call)
     if value_store is None:
         return scope
     return (*scope, fully_qualified_name(value_store.__class__))
@@ -105,7 +105,7 @@ def _get_stale_nodes(
 
     def process_with_callbacks(node):
         if type(node) is Call:
-            scope = _get_stale_scope(node, plan, registry)
+            scope = _get_stale_scope(node, registry)
             progress_observer.increment_running(section="stale", scope=scope)
             try:
                 process(node)
@@ -172,7 +172,7 @@ def _update_stale_totals(
     plan: Plan, registry: Registry, progress_observer: ProgressObserver
 ) -> None:
     scope_counts = collections.Counter(
-        _get_stale_scope(node, plan, registry)
+        _get_stale_scope(node, registry)
         for node in plan.graph.nodes()
         if type(node) is Call
     )

@@ -19,7 +19,7 @@ from threading import RLock
 from typing import Callable, ContextManager, Tuple
 
 from uberjob import _builtins
-from uberjob._util import fully_qualified_name, validation
+from uberjob._util import validation
 from uberjob._util.traceback import get_stack_frame
 from uberjob.graph import (
     Call,
@@ -55,10 +55,8 @@ class Plan:
         self._scope_lock = RLock()
 
     def _call(self, stack_frame, fn: Callable, *args, **kwargs) -> Call:
-        call = Call(fn, stack_frame=stack_frame)
-        self.graph.add_node(
-            call, scope=self._scope, implicit_scope=(fully_qualified_name(fn),)
-        )
+        call = Call(fn, scope=self._scope, stack_frame=stack_frame)
+        self.graph.add_node(call)
         for index, arg in enumerate(args):
             self.graph.add_edge(
                 self._gather(stack_frame, arg), call, PositionalArg(index)
@@ -94,8 +92,8 @@ class Plan:
         """
         if _is_node(value):
             raise TypeError(f"The value is already a {Node.__name__}.")
-        literal = Literal(value)
-        self.graph.add_node(literal, scope=self._scope)
+        literal = Literal(value, scope=self._scope)
+        self.graph.add_node(literal)
         return literal
 
     def add_dependency(self, source: Node, target: Node) -> None:

@@ -25,7 +25,7 @@ from uberjob._registry import Registry, RegistryValue
 from uberjob._transformations import get_mutable_plan
 from uberjob._transformations.pruning import prune_plan, prune_source_literals
 from uberjob._util import Slot, fully_qualified_name, safe_max
-from uberjob.graph import Call, Dependency, KeywordArg, Node, PositionalArg, get_scope
+from uberjob.graph import Call, Dependency, KeywordArg, Node, PositionalArg
 from uberjob.progress._progress_observer import ProgressObserver
 
 
@@ -131,17 +131,14 @@ def _add_value_store(
 ) -> Tuple[Optional[Node], Node]:
     def nested_call(*args):
         call = plan._call(registry_value.stack_frame, *args)
-        call_data = plan.graph.nodes[call]
-        call_data["implicit_scope"] = (
-            plan.graph.nodes[node].get("implicit_scope", ())
-            + call_data["implicit_scope"]
-        )
+        if type(node) is Call:
+            call.scope = get_full_call_scope(node)
         return call
 
     out_edges = list(plan.graph.out_edges(node, keys=True))
     value_store = registry_value.value_store
 
-    with plan.scope(*get_scope(plan.graph, node)):
+    with plan.scope(*node.scope):
         value_store_lit = plan.lit(value_store)
         write_node = None
         read_node = nested_call(value_store.__class__.read, value_store_lit)

@@ -14,6 +14,7 @@
 # limitations under the License.
 #
 """Provides the underlying graph, node, and edge classes used by the :class:`~uberjob.Plan`."""
+import warnings
 from typing import Callable, Dict, List, Tuple
 
 import networkx as nx
@@ -170,6 +171,21 @@ def get_argument_nodes(graph: Graph, call: Call) -> Tuple[List[Node], Dict[str, 
             keyword_arg_pairs[edge_key.index] = edge_key.name, predecessor
 
     return args, dict(keyword_arg_pairs)
+
+
+def get_scope(graph: Graph, node: Node) -> Tuple:
+    """
+    Return the scope of the given :class:`~uberjob.graph.Node`.
+
+    This function is deprecated. Use ``node.scope`` instead.
+
+    :param graph: The graph.
+    :param node: The node.
+    """
+    warnings.warn(
+        "get_scope is deprecated. Use node.scope instead.", DeprecationWarning
+    )
+    return node.scope
 
 
 __all__ = [

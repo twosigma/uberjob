@@ -15,8 +15,8 @@
 #
 from typing import Tuple
 
-from uberjob.graph import Call
 from uberjob._util import fully_qualified_name
+from uberjob.graph import Call
 
 
 def get_full_call_scope(call: Call) -> Tuple:

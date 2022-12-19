@@ -197,4 +197,5 @@ __all__ = [
     "PositionalArg",
     "KeywordArg",
     "get_argument_nodes",
+    "get_scope",
 ]

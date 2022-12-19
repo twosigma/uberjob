@@ -27,7 +27,6 @@ from uberjob.graph import (
     Literal,
     Node,
     PositionalArg,
-    get_scope,
 )
 
 TEAL = (0, 154 / 255, 166 / 255)
@@ -168,7 +167,7 @@ def render(
     if level is not None:
         scope_groups = OrderedDict()
         for u in graph.nodes():
-            scope = get_scope(graph, u)
+            scope = u.scope
             if scope:
                 scope_groups.setdefault(scope[:level], []).append(u)
         for scope, group in scope_groups.items():

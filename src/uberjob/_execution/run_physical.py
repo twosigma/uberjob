@@ -18,7 +18,7 @@ from typing import Any, Callable, Dict, NamedTuple, Optional
 
 from uberjob._errors import create_chained_call_error
 from uberjob._execution.run_function_on_graph import run_function_on_graph
-from uberjob._graph import get_full_scope
+from uberjob._graph import get_full_call_scope
 from uberjob._plan import Plan
 from uberjob._transformations.pruning import prune_source_literals
 from uberjob._util import Slot
@@ -95,7 +95,7 @@ def prep_run_physical(
 
     def process(node):
         if type(node) is Call:
-            scope = get_full_scope(plan.graph, node)
+            scope = get_full_call_scope(node)
             progress_observer.increment_running(section="run", scope=scope)
             bound_call = bound_call_lookup[node]
             try:

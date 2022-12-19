@@ -20,7 +20,7 @@ from typing import Callable, Iterable, Optional, Tuple, Union
 from uberjob._errors import CallError
 from uberjob._execution.run_function_on_graph import NodeError
 from uberjob._execution.run_physical import run_physical
-from uberjob._graph import get_full_scope
+from uberjob._graph import get_full_call_scope
 from uberjob._plan import Plan
 from uberjob._registry import Registry
 from uberjob._transformations import get_mutable_plan
@@ -40,9 +40,7 @@ from uberjob.progress import (
 
 def _update_run_totals(plan: Plan, progress_observer: ProgressObserver) -> None:
     scope_counts = collections.Counter(
-        get_full_scope(plan.graph, node)
-        for node in plan.graph.nodes()
-        if type(node) is Call
+        get_full_call_scope(node) for node in plan.graph.nodes() if type(node) is Call
     )
     for scope, count in scope_counts.items():
         progress_observer.increment_total(section="run", scope=scope, amount=count)

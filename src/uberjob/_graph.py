@@ -15,12 +15,12 @@
 #
 from typing import Tuple
 
-from uberjob.graph import Graph, Node
+from uberjob._util import fully_qualified_name
+from uberjob.graph import Call
 
 
-def get_full_scope(graph: Graph, node: Node) -> Tuple:
-    node_data = graph.nodes[node]
-    return node_data["scope"] + node_data.get("implicit_scope", ())
+def get_full_call_scope(call: Call) -> Tuple:
+    return (*call.scope, fully_qualified_name(call.fn))
 
 
-__all__ = ["get_full_scope"]
+__all__ = ["get_full_call_scope"]

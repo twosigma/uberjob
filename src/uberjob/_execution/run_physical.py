@@ -31,18 +31,17 @@ from uberjob.progress._progress_observer import ProgressObserver
 class BoundCall:
     """A bound symbolic function call."""
 
-    __slots__ = ("fn", "args", "kwargs", "result")
+    __slots__ = ("args", "kwargs", "result")
 
-    def __init__(self, fn, args, kwargs, result):
-        self.fn = fn
+    def __init__(self, args, kwargs, result):
         self.args = args
         self.kwargs = kwargs
         self.result = result
 
-    def run(self):
+    def run(self, fn):
         args = [arg.value for arg in self.args]
         kwargs = {name: arg.value for name, arg in self.kwargs.items()}
-        self.result.value = self.fn(*args, **kwargs)
+        self.result.value = fn(*args, **kwargs)
 
 
 def _create_bound_call(
@@ -52,7 +51,7 @@ def _create_bound_call(
     args = [result_lookup[predecessor] for predecessor in args]
     kwargs = {name: result_lookup[predecessor] for name, predecessor in kwargs.items()}
     result = result_lookup[call]
-    return BoundCall(call.fn, args, kwargs, result)
+    return BoundCall(args, kwargs, result)
 
 
 def _create_bound_call_lookup_and_output_slot(
@@ -99,7 +98,7 @@ def prep_run_physical(
             progress_observer.increment_running(section="run", scope=scope)
             bound_call = bound_call_lookup[node]
             try:
-                retry(bound_call.value.run)()
+                bound_call.value.run(retry(node.fn))
             except Exception as exception:
                 progress_observer.increment_failed(
                     section="run",

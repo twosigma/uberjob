@@ -303,6 +303,29 @@ class PlanTestCase(UberjobTestCase):
         self.assertEqual(retry_count_slot[0], 5)
         self.assertEqual(fizz_count_slot[0], 5)
 
+    def test_retry_custom_receives_args(self):
+        observed_args = None
+        observed_kwargs = None
+
+        def magic_retry(f):
+            def wrapper(*args, **kwargs):
+                nonlocal observed_args
+                nonlocal observed_kwargs
+                observed_args = args
+                observed_kwargs = kwargs
+                return f(*args, **kwargs)
+
+            return wrapper
+
+        def fizz(a, b, c, d):
+            return a + b + c + d
+
+        plan = uberjob.Plan()
+        x = plan.call(fizz, 1, 2, c=3, d=4)
+        self.assertEqual(uberjob.run(plan, output=x, retry=magic_retry), 10)
+        self.assertEqual(observed_args, (1, 2))
+        self.assertEqual(observed_kwargs, {"c": 3, "d": 4})
+
     def test_retry_validation(self):
         plan = uberjob.Plan()
         with self.assertRaises(TypeError):

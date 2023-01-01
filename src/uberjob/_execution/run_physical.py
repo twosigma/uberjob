@@ -31,7 +31,7 @@ from uberjob.progress._progress_observer import ProgressObserver
 class BoundCall:
     """A bound symbolic function call."""
 
-    __slots__ = ("fn", "args", "kwargs", "result")
+    __slots__ = ("args", "kwargs", "result")
 
     def __init__(self, args, kwargs, result):
         self.args = args

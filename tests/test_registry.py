@@ -343,3 +343,62 @@ class RegistryTestCase(UberjobTestCase):
         self.assertNotIn(y, registry)
         self.assertIn(x, registry_copy)
         self.assertEqual(registry[x], registry_copy[x])
+
+    def test_traceback_manipulation(self):
+        def buzz():
+            raise ValueError()
+
+        def fizz():
+            try:
+                return buzz()
+            except ValueError as e:
+                raise Exception() from e
+
+        class BadValueStore(uberjob.ValueStore):
+            def read(self):
+                raise NotImplementedError()
+
+            def write(self):
+                raise NotImplementedError()
+
+            def get_modified_time(self):
+                return fizz()
+
+        class BadValueStore2(uberjob.ValueStore):
+            def read(self):
+                raise NotImplementedError()
+
+            def write(self):
+                raise NotImplementedError()
+
+            def get_modified_time(self):
+                return 7
+
+        plan = uberjob.Plan()
+        registry = uberjob.Registry()
+        node = registry.source(plan, BadValueStore())
+
+        with self.assert_call_exception(
+            expected_exception_chain_traceback_summary=[
+                ["get_modified_time", "fizz"],
+                ["fizz", "buzz"],
+            ]
+        ):
+            uberjob.run(plan, registry=registry, output=node)
+
+        def bad_retry(f):
+            raise Exception()
+
+        with self.assert_call_exception(
+            expected_exception_chain_traceback_summary=[["bad_retry"]]
+        ):
+            uberjob.run(plan, registry=registry, output=node, retry=bad_retry)
+
+        plan = uberjob.Plan()
+        registry = uberjob.Registry()
+        node = registry.source(plan, BadValueStore2())
+
+        with self.assert_call_exception(
+            expected_exception_chain_traceback_summary=[["_to_naive_utc_time"]]
+        ):
+            uberjob.run(plan, registry=registry, output=node)

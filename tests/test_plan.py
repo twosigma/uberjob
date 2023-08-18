@@ -334,3 +334,42 @@ class PlanTestCase(UberjobTestCase):
             uberjob.run(plan, retry=0)
         with self.assertRaises(ValueError):
             uberjob.run(plan, retry=-1)
+
+    def test_traceback_manipulation(self):
+        def x():
+            raise IOError("buzz")
+
+        def y():
+            try:
+                return x()
+            except Exception as e:
+                raise ValueError("fizz") from e
+
+        def z():
+            return y()
+
+        plan = uberjob.Plan()
+        call = plan.call(z)
+        with self.assert_call_exception(
+            expected_exception_chain_traceback_summary=[["z", "y"], ["y", "x"]]
+        ):
+            uberjob.run(plan, output=call)
+
+        def bad_retry1(f):
+            raise Exception()
+
+        with self.assert_call_exception(
+            expected_exception_chain_traceback_summary=[["bad_retry1"]]
+        ):
+            uberjob.run(plan, output=call, retry=bad_retry1)
+
+        def bad_retry2(f):
+            def wrapper(*args, **kwargs):
+                raise ValueError()
+
+            return wrapper
+
+        with self.assert_call_exception(
+            expected_exception_chain_traceback_summary=[["wrapper"]]
+        ):
+            uberjob.run(plan, output=call, retry=bad_retry2)

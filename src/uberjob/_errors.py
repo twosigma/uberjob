@@ -15,7 +15,17 @@
 #
 from uberjob._util import fully_qualified_name
 from uberjob._util.traceback import render_symbolic_traceback
-from uberjob.graph import Call
+from uberjob.graph import Call, Node
+
+
+class NodeError(Exception):
+    """An exception was raised during execution of a node."""
+
+    def __init__(self, node: Node):
+        super().__init__(
+            f"An exception was raised during execution of the following node: {node!r}."
+        )
+        self.node = node
 
 
 class CallError(Exception):

@@ -19,19 +19,10 @@ import threading
 from contextlib import contextmanager
 from typing import Dict, List, NamedTuple, Set
 
+from uberjob._errors import NodeError
 from uberjob._execution.scheduler import create_queue
 from uberjob._util.networkx_util import assert_acyclic, predecessor_count
 from uberjob.graph import Node
-
-
-class NodeError(Exception):
-    """An exception was raised during execution of a node."""
-
-    def __init__(self, node):
-        super().__init__(
-            f"An exception was raised during execution of the following node: {node!r}."
-        )
-        self.node = node
 
 
 def coerce_worker_count(worker_count):
@@ -111,6 +102,14 @@ def prepare_nodes(graph) -> PreparedNodes:
     )
 
 
+def coerce_node_error(node: Node, exception: Exception) -> NodeError:
+    if isinstance(exception, NodeError):
+        return exception
+    node_error = NodeError(node)
+    node_error.__cause__ = exception
+    return node_error
+
+
 def run_function_on_graph(
     graph, fn, *, worker_count=None, max_errors=0, scheduler=None
 ):
@@ -142,8 +141,7 @@ def run_function_on_graph(
             with failure_lock:
                 error_count += 1
                 if not first_node_error:
-                    first_node_error = NodeError(node)
-                    first_node_error.__cause__ = exception
+                    first_node_error = coerce_node_error(node, exception)
                 if max_errors is not None and error_count > max_errors:
                     stop = True
         else:

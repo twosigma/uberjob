@@ -17,7 +17,7 @@ import collections
 import datetime as dt
 from typing import Optional, Set, Tuple
 
-from uberjob._errors import create_chained_call_error
+from uberjob._errors import NodeError, create_chained_call_error
 from uberjob._execution.run_function_on_graph import run_function_on_graph
 from uberjob._graph import get_full_call_scope
 from uberjob._plan import Plan
@@ -110,12 +110,16 @@ def _get_stale_nodes(
             try:
                 process(node)
             except Exception as exception:
+                # Drop internal frames
+                exception.__traceback__ = (
+                    exception.__traceback__.tb_next.tb_next.tb_next
+                )
                 progress_observer.increment_failed(
                     section="stale",
                     scope=scope,
                     exception=create_chained_call_error(node, exception),
                 )
-                raise
+                raise NodeError(node) from exception
             progress_observer.increment_completed(section="stale", scope=scope)
         else:
             process(node)

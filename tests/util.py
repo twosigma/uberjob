@@ -21,7 +21,7 @@ from uberjob._errors import CallError
 from uberjob._util.traceback import StackFrame
 
 
-def _traceback_summary(traceback) -> list[str]:
+def _traceback_summary(traceback):
     result = []
     while traceback is not None:
         result.append(traceback.tb_frame.f_code.co_name)
@@ -29,7 +29,7 @@ def _traceback_summary(traceback) -> list[str]:
     return result
 
 
-def _exception_chain_traceback_summary(exception) -> list[list[str]]:
+def _exception_chain_traceback_summary(exception):
     result = []
     while exception is not None:
         result.append(_traceback_summary(exception.__traceback__))

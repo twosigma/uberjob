@@ -52,7 +52,6 @@ def lint(session):
     """Lint using flake8."""
     args = session.posargs or SOURCES
     session.run("poetry", "install", external=True)
-    print(args)
     session.run("poetry", "run", "flake8", *args, external=True)
 
 

@@ -14,7 +14,7 @@ packages = [
 ]
 readme = "README.md"
 repository = "https://github.com/twosigma/uberjob"
-version = "1.0.0"
+version = "1.0.1"
 
 [tool.poetry.dependencies]
 networkx = "^2.5"

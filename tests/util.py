@@ -21,23 +21,48 @@ from uberjob._errors import CallError
 from uberjob._util.traceback import StackFrame
 
 
+def _traceback_summary(traceback):
+    result = []
+    while traceback is not None:
+        result.append(traceback.tb_frame.f_code.co_name)
+        traceback = traceback.tb_next
+    return result
+
+
+def _exception_chain_traceback_summary(exception):
+    result = []
+    while exception is not None:
+        result.append(_traceback_summary(exception.__traceback__))
+        exception = exception.__cause__
+    return result
+
+
 @contextmanager
 def assert_call_exception(
-    test_case, expected_exception=None, expected_regex=None, expected_stack_frame=None
+    test_case,
+    expected_exception=None,
+    expected_regex=None,
+    expected_stack_frame=None,
+    expected_exception_chain_traceback_summary=None,
 ):
     try:
         yield
     except CallError as e:
         test_case.assertRegex(str(e), "An exception was raised in a symbolic call.*")
-        if expected_exception:
+        if expected_exception is not None:
             test_case.assertIsInstance(e.__cause__, expected_exception)
-        if expected_regex:
+        if expected_regex is not None:
             test_case.assertRegex(str(e.__cause__), expected_regex)
-        if expected_stack_frame:
+        if expected_stack_frame is not None:
             stack_frame = e.call.stack_frame
             test_case.assertEqual(stack_frame.name, expected_stack_frame.name)
             test_case.assertEqual(stack_frame.path, expected_stack_frame.path)
             test_case.assertEqual(stack_frame.line, expected_stack_frame.line)
+        if expected_exception_chain_traceback_summary is not None:
+            test_case.assertEqual(
+                _exception_chain_traceback_summary(e.__cause__),
+                expected_exception_chain_traceback_summary,
+            )
     else:
         test_case.fail("Call exception not raised.")
 

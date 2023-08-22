@@ -16,7 +16,7 @@
 """Functionality for executing a physical plan"""
 from typing import Any, Callable, Dict, NamedTuple, Optional
 
-from uberjob._errors import create_chained_call_error
+from uberjob._errors import NodeError, create_chained_call_error
 from uberjob._execution.run_function_on_graph import run_function_on_graph
 from uberjob._graph import get_full_call_scope
 from uberjob._plan import Plan
@@ -38,10 +38,10 @@ class BoundCall:
         self.kwargs = kwargs
         self.result = result
 
-    def run(self, fn):
+    def run(self, fn, retry):
         args = [arg.value for arg in self.args]
         kwargs = {name: arg.value for name, arg in self.kwargs.items()}
-        self.result.value = fn(*args, **kwargs)
+        self.result.value = retry(fn)(*args, **kwargs)
 
 
 def _create_bound_call(
@@ -98,14 +98,16 @@ def prep_run_physical(
             progress_observer.increment_running(section="run", scope=scope)
             bound_call = bound_call_lookup[node]
             try:
-                bound_call.value.run(retry(node.fn))
+                bound_call.value.run(node.fn, retry)
             except Exception as exception:
+                # Drop internal frames
+                exception.__traceback__ = exception.__traceback__.tb_next.tb_next
                 progress_observer.increment_failed(
                     section="run",
                     scope=scope,
                     exception=create_chained_call_error(node, exception),
                 )
-                raise
+                raise NodeError(node) from exception
             finally:
                 bound_call.value = None
             progress_observer.increment_completed(section="run", scope=scope)

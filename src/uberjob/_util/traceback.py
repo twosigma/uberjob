@@ -56,7 +56,7 @@ class TruncatedStackFrameType:
 TruncatedStackFrame = TruncatedStackFrameType()
 
 
-MAX_TRACEBACK_DEPTH = 15
+MAX_TRACEBACK_DEPTH = 3
 
 
 def get_stack_frame(initial_depth=2):
@@ -73,9 +73,8 @@ def get_stack_frame(initial_depth=2):
         )
 
     initial_frame = inspect.currentframe()
-    while initial_depth:
+    for _ in range(initial_depth):
         initial_frame = initial_frame.f_back
-        initial_depth -= 1
     return recurse(initial_frame, MAX_TRACEBACK_DEPTH)
 
 

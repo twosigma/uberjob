@@ -16,7 +16,7 @@
 import operator
 from contextlib import contextmanager
 from threading import RLock
-from typing import Callable, ContextManager, Tuple
+from typing import Callable, Generator, Tuple
 
 from uberjob import _builtins
 from uberjob._util import validation
@@ -67,7 +67,7 @@ class Plan:
             )
         return call
 
-    def call(self, fn: Callable, *args, **kwargs) -> Call:
+    def call(self, fn: Callable, /, *args, **kwargs) -> Call:
         """
         Add a function call to this :class:`~uberjob.Plan`.
 
@@ -158,7 +158,7 @@ class Plan:
         )
 
     @contextmanager
-    def scope(self, *args) -> ContextManager[None]:
+    def scope(self, *args) -> Generator[None, None, None]:
         """
         A context manager for organizing a :class:`~uberjob.Plan`.
 

@@ -18,7 +18,7 @@ import os
 import pathlib
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
-from typing import IO, AnyStr, ContextManager, Optional, Union
+from typing import IO, AnyStr, Generator, Optional, Union
 
 from uberjob._util import repr_helper
 from uberjob._value_store import ValueStore
@@ -49,7 +49,7 @@ def _try_remove(path):
 @contextmanager
 def staged_write_path(
     path: Union[str, pathlib.Path]
-) -> ContextManager[Union[str, pathlib.Path]]:
+) -> Generator[Union[str, pathlib.Path], None, None]:
     """
     Context manager for writing a file atomically.
 
@@ -72,7 +72,7 @@ def staged_write_path(
 @contextmanager
 def staged_write(
     path: Union[str, pathlib.Path], mode="w", **kwargs
-) -> ContextManager[IO[AnyStr]]:
+) -> Generator[IO[AnyStr], None, None]:
     """
     Context manager for writing a file atomically.
 

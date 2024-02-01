@@ -61,12 +61,14 @@ def get_elapsed_string(elapsed: float) -> str:
 
 
 class ScopeState:
-    def __init__(self):
-        self.completed = 0
-        self.failed = 0
-        self.running = 0
-        self.total = 0
-        self.weighted_elapsed = 0
+    def __init__(
+        self, *, completed=0, failed=0, running=0, total=0, weighted_elapsed=0
+    ):
+        self.completed = completed
+        self.failed = failed
+        self.running = running
+        self.total = total
+        self.weighted_elapsed = weighted_elapsed
 
     def to_progress_string(self):
         return _get_progress_string(

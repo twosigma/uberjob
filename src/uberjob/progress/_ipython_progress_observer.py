@@ -74,7 +74,7 @@ class IPythonProgressObserver(SimpleProgressObserver):
                 title_widget = self._get(
                     "section", section, "title", default=widgets.HTML
                 )
-                title_widget.value = "<b>{}</b>".format(html.escape(title))
+                title_widget.value = f"<b>{html.escape(title)}</b>"
                 children.append(title_widget)
                 for scope, scope_state in sorted_scope_items(scope_mapping):
                     progress_widget = self._get(
@@ -137,9 +137,7 @@ class IPythonProgressObserver(SimpleProgressObserver):
                 )
             )
             exception_text_widgets.append(exception_text_widget)
-            exception_titles.append(
-                "Exception {}; {}".format(i + 1, get_scope_string(scope))
-            )
+            exception_titles.append(f"Exception {i + 1}; {get_scope_string(scope)}")
         exception_accordion.children = exception_text_widgets
         for i, exception_title in enumerate(exception_titles):
             exception_accordion.set_title(i, exception_title)

@@ -15,7 +15,7 @@
 #
 """Provides the underlying graph, node, and edge classes used by the :class:`~uberjob.Plan`."""
 import warnings
-from typing import Callable, Dict, List, Tuple
+from typing import Callable
 
 import networkx as nx
 
@@ -147,7 +147,7 @@ class KeywordArg(Dependency):
         )
 
 
-def get_argument_nodes(graph: Graph, call: Call) -> Tuple[List[Node], Dict[str, Node]]:
+def get_argument_nodes(graph: Graph, call: Call) -> tuple[list[Node], dict[str, Node]]:
     """
     Return the symbolic args and kwargs of the given :class:`~uberjob.graph.Call`.
 
@@ -173,7 +173,7 @@ def get_argument_nodes(graph: Graph, call: Call) -> Tuple[List[Node], Dict[str, 
     return args, dict(keyword_arg_pairs)
 
 
-def get_scope(graph: Graph, node: Node) -> Tuple:
+def get_scope(graph: Graph, node: Node) -> tuple:
     """
     Return the scope of the given :class:`~uberjob.graph.Node`.
 

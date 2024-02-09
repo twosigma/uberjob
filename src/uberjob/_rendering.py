@@ -130,7 +130,7 @@ class Scope:
 
 
 def render(
-    plan: typing.Union[Plan, Graph, typing.Tuple[Plan, typing.Optional[Node]]],
+    plan: typing.Union[Plan, Graph, tuple[Plan, typing.Optional[Node]]],
     *,
     registry: Registry = None,
     predicate: typing.Callable[[Node, dict], bool] = None,

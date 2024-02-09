@@ -17,7 +17,7 @@
 import os
 import threading
 from contextlib import contextmanager
-from typing import Dict, List, NamedTuple, Set
+from typing import NamedTuple
 
 from uberjob._errors import NodeError
 from uberjob._execution.scheduler import create_queue
@@ -80,9 +80,9 @@ def worker_pool(queue, process_item, worker_count):
 
 
 class PreparedNodes(NamedTuple):
-    source_nodes: List[Node]
-    single_parent_nodes: Set[Node]
-    remaining_pred_count_mapping: Dict[Node, int]
+    source_nodes: list[Node]
+    single_parent_nodes: set[Node]
+    remaining_pred_count_mapping: dict[Node, int]
 
 
 def prepare_nodes(graph) -> PreparedNodes:

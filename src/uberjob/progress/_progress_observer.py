@@ -14,7 +14,6 @@
 # limitations under the License.
 #
 from abc import ABC, abstractmethod
-from typing import Tuple
 
 
 class ProgressObserver(ABC):
@@ -29,7 +28,7 @@ class ProgressObserver(ABC):
         """Stop observing progress."""
 
     @abstractmethod
-    def increment_total(self, *, section: str, scope: Tuple, amount: int):
+    def increment_total(self, *, section: str, scope: tuple, amount: int):
         """
         Increment the number of entries in this section and scope by the specified amount.
 
@@ -39,7 +38,7 @@ class ProgressObserver(ABC):
         """
 
     @abstractmethod
-    def increment_running(self, *, section: str, scope: Tuple):
+    def increment_running(self, *, section: str, scope: tuple):
         """
         Increment the number of running entries in this section and scope. This method must be thread-safe.
 
@@ -48,7 +47,7 @@ class ProgressObserver(ABC):
         """
 
     @abstractmethod
-    def increment_completed(self, *, section: str, scope: Tuple):
+    def increment_completed(self, *, section: str, scope: tuple):
         """
         Increment the number of completed entries in this section and scope. This method must be thread-safe.
 
@@ -57,7 +56,7 @@ class ProgressObserver(ABC):
         """
 
     @abstractmethod
-    def increment_failed(self, *, section: str, scope: Tuple, exception: Exception):
+    def increment_failed(self, *, section: str, scope: tuple, exception: Exception):
         """
         Increment the number of failed entries in this section and scope. This method must be thread-safe.
 

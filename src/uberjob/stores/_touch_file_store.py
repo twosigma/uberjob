@@ -31,7 +31,7 @@ class TouchFileStore(FileStore):
         """Return ``None`` after ensuring that the touch file exists and is empty."""
         with open(self.path, "rb") as inputfile:
             if inputfile.read(1):
-                raise IOError(f"The path {self.path!r} exists but is not empty.")
+                raise OSError(f"The path {self.path!r} exists but is not empty.")
         return None
 
     def write(self, value: None) -> None:

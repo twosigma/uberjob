@@ -16,7 +16,6 @@
 import threading
 import time
 from abc import ABC, abstractmethod
-from typing import Tuple
 
 from uberjob.progress._progress_observer import ProgressObserver
 
@@ -202,22 +201,22 @@ class SimpleProgressObserver(ProgressObserver, ABC):
             if output_value is not None:
                 self._output(output_value)
 
-    def increment_total(self, *, section: str, scope: Tuple, amount: int):
+    def increment_total(self, *, section: str, scope: tuple, amount: int):
         with self._lock:
             self._stale = True
             self._state.increment_total(section, scope, amount)
 
-    def increment_running(self, *, section: str, scope: Tuple):
+    def increment_running(self, *, section: str, scope: tuple):
         with self._lock:
             self._stale = True
             self._state.increment_running(section, scope)
 
-    def increment_completed(self, *, section: str, scope: Tuple):
+    def increment_completed(self, *, section: str, scope: tuple):
         with self._lock:
             self._stale = True
             self._state.increment_completed(section, scope)
 
-    def increment_failed(self, *, section: str, scope: Tuple, exception: Exception):
+    def increment_failed(self, *, section: str, scope: tuple, exception: Exception):
         with self._lock:
             self._stale = True
             self._state.increment_failed(section, scope)

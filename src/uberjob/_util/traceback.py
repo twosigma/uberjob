@@ -48,9 +48,17 @@ class StackFrame:
         )
 
 
+TruncatedStackFrame = None
+
+
 class TruncatedStackFrameType:
     def __repr__(self):
         return "TruncatedStackFrame"
+
+    def __new__(cls, *args, **kwargs):
+        if TruncatedStackFrame is not None:
+            return TruncatedStackFrame
+        return super().__new__(cls, *args, **kwargs)
 
 
 TruncatedStackFrame = TruncatedStackFrameType()

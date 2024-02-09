@@ -27,6 +27,9 @@ class NodeError(Exception):
         )
         self.node = node
 
+    def __reduce__(self):
+        return NodeError, (self.node,)
+
 
 class CallError(Exception):
     """
@@ -45,6 +48,9 @@ class CallError(Exception):
             )
         )
         self.call = call
+
+    def __reduce__(self):
+        return CallError, (self.call,)
 
 
 class NotTransformedError(Exception):

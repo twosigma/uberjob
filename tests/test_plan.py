@@ -16,12 +16,14 @@
 import operator
 import os
 import pathlib
+import pickle
 import re
 import tempfile
 
 import networkx as nx
 
 import uberjob
+from uberjob._errors import NodeError
 from uberjob._util.traceback import get_stack_frame
 from uberjob.graph import Call
 from uberjob.progress import console_progress, default_progress, html_progress
@@ -373,3 +375,33 @@ class PlanTestCase(UberjobTestCase):
             expected_exception_chain_traceback_summary=[["wrapper"]]
         ):
             uberjob.run(plan, output=call, retry=bad_retry2)
+
+    def test_serialize_call_error(self):
+        plan = uberjob.Plan()
+        call = plan.call(operator.truediv, 1, 0)
+        exception = None
+        try:
+            uberjob.run(plan, output=call)
+        except uberjob.CallError as e:
+            exception = e
+        self.assertIsNotNone(exception)
+        pickled_exception = pickle.dumps(exception)
+        unpickled_exception = pickle.loads(pickled_exception)
+        self.assertIsInstance(unpickled_exception, uberjob.CallError)
+        self.assertIsInstance(unpickled_exception.call, Call)
+        self.assertIs(unpickled_exception.call.fn, operator.truediv)
+
+    def test_serialize_node_error(self):
+        plan = uberjob.Plan()
+        call = plan.call(pow, 2, 2)
+        exception = None
+        try:
+            raise NodeError(call)
+        except NodeError as e:
+            exception = e
+        self.assertIsNotNone(exception)
+        pickled_exception = pickle.dumps(exception)
+        unpickled_exception = pickle.loads(pickled_exception)
+        self.assertIsInstance(unpickled_exception, NodeError)
+        self.assertIsInstance(unpickled_exception.node, Call)
+        self.assertIs(unpickled_exception.node.fn, pow)

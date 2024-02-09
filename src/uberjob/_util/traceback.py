@@ -81,7 +81,7 @@ def get_stack_frame(initial_depth=2):
 def render_symbolic_traceback(stack_frame):
     stack_frames = []
     while stack_frame:
-        if stack_frame is TruncatedStackFrame:
+        if type(stack_frame) is TruncatedStackFrameType:
             stack_frames.append(stack_frame)
             break
         if "/IPython/core/" in stack_frame.path:
@@ -90,7 +90,7 @@ def render_symbolic_traceback(stack_frame):
         stack_frame = stack_frame.outer
 
     def format_stack_frame(s):
-        if s is TruncatedStackFrame:
+        if type(s) is TruncatedStackFrameType:
             return "  ... truncated"
         return f'  File "{s.path}", line {s.line}, in {s.name}'
 

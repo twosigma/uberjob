@@ -48,9 +48,17 @@ class StackFrame:
         )
 
 
+TruncatedStackFrame = None
+
+
 class TruncatedStackFrameType:
     def __repr__(self):
         return "TruncatedStackFrame"
+
+    def __new__(cls, *args, **kwargs):
+        if TruncatedStackFrame is not None:
+            return TruncatedStackFrame
+        return super().__new__(cls, *args, **kwargs)
 
 
 TruncatedStackFrame = TruncatedStackFrameType()
@@ -81,7 +89,7 @@ def get_stack_frame(initial_depth=2):
 def render_symbolic_traceback(stack_frame):
     stack_frames = []
     while stack_frame:
-        if type(stack_frame) is TruncatedStackFrameType:
+        if stack_frame is TruncatedStackFrame:
             stack_frames.append(stack_frame)
             break
         if "/IPython/core/" in stack_frame.path:
@@ -90,7 +98,7 @@ def render_symbolic_traceback(stack_frame):
         stack_frame = stack_frame.outer
 
     def format_stack_frame(s):
-        if type(s) is TruncatedStackFrameType:
+        if s is TruncatedStackFrame:
             return "  ... truncated"
         return f'  File "{s.path}", line {s.line}, in {s.name}'
 

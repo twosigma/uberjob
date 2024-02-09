@@ -17,8 +17,9 @@ import datetime as dt
 import os
 import pathlib
 from abc import ABC, abstractmethod
+from collections.abc import Generator
 from contextlib import contextmanager
-from typing import IO, AnyStr, Generator, Optional, Union
+from typing import IO, AnyStr, Optional, Union
 
 from uberjob._util import repr_helper
 from uberjob._value_store import ValueStore

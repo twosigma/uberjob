@@ -44,7 +44,7 @@ def _ralign(strings):
 
 def _print_section(print_, section, scope_mapping):
     scope_items = sorted_scope_items(scope_mapping)
-    print_("{}:".format(section))
+    print_(f"{section}:")
     progress_strs = _ralign(
         scope_state.to_progress_string() for scope, scope_state in scope_items
     )
@@ -54,9 +54,7 @@ def _print_section(print_, section, scope_mapping):
     for progress_str, elapsed_str, (scope, _scope_state) in zip(
         progress_strs, elapsed_strs, scope_items
     ):
-        print_(
-            "  {} | {} | {}".format(progress_str, elapsed_str, get_scope_string(scope))
-        )
+        print_(f"  {progress_str} | {elapsed_str} | {get_scope_string(scope)}")
 
 
 def _print_new_exceptions(print_, new_exception_index, exception_tuples):

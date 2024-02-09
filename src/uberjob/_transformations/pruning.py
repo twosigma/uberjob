@@ -14,7 +14,8 @@
 # limitations under the License.
 #
 import itertools
-from typing import Callable, Iterable, Optional
+from collections.abc import Iterable
+from typing import Callable, Optional
 
 from uberjob._plan import Plan
 from uberjob._transformations import get_mutable_plan

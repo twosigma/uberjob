@@ -107,7 +107,7 @@ class Registry:
         """
         return self.mapping.keys()
 
-    def values(self) -> typing.List[ValueStore]:
+    def values(self) -> list[ValueStore]:
         """
         Get all registered :class:`~uberjob.ValueStore` instances.
 
@@ -115,7 +115,7 @@ class Registry:
         """
         return [v.value_store for v in self.mapping.values()]
 
-    def items(self) -> typing.List[typing.Tuple[Node, ValueStore]]:
+    def items(self) -> list[tuple[Node, ValueStore]]:
         """
         Get all registered (node, value_store) pairs.
 

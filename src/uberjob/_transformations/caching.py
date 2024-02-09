@@ -15,7 +15,7 @@
 #
 import collections
 import datetime as dt
-from typing import Optional, Set, Tuple
+from typing import Optional
 
 from uberjob._errors import NodeError, create_chained_call_error
 from uberjob._execution.run_function_on_graph import run_function_on_graph
@@ -47,7 +47,7 @@ def _to_naive_utc_time(value: Optional[dt.datetime]) -> Optional[dt.datetime]:
     )
 
 
-def _get_stale_scope(call: Call, registry: Registry) -> Tuple:
+def _get_stale_scope(call: Call, registry: Registry) -> tuple:
     scope = get_full_call_scope(call)
     value_store = registry.get(call)
     if value_store is None:
@@ -63,7 +63,7 @@ def _get_stale_nodes(
     max_workers: Optional[int] = None,
     fresh_time: Optional[dt.datetime] = None,
     progress_observer: ProgressObserver,
-) -> Set[Node]:
+) -> set[Node]:
     plan = prune_source_literals(
         plan, inplace=False, predicate=lambda node: node not in registry
     )
@@ -132,7 +132,7 @@ def _get_stale_nodes(
 
 def _add_value_store(
     plan: Plan, node: Node, registry_value: RegistryValue, *, is_stale: bool
-) -> Tuple[Optional[Node], Node]:
+) -> tuple[Optional[Node], Node]:
     def nested_call(*args):
         call = plan._call(registry_value.stack_frame, *args)
         if type(node) is Call:
@@ -191,7 +191,7 @@ def plan_with_value_stores(
     fresh_time: Optional[dt.datetime] = None,
     inplace: bool,
     progress_observer,
-) -> Tuple[Plan, Optional[Node]]:
+) -> tuple[Plan, Optional[Node]]:
     _update_stale_totals(plan, registry, progress_observer)
     plan = get_mutable_plan(plan, inplace=inplace)
     stale_nodes = _get_stale_nodes(

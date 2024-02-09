@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 """Functionality for executing a physical plan"""
-from typing import Any, Callable, Dict, NamedTuple, Optional
+from typing import Any, Callable, NamedTuple, Optional
 
 from uberjob._errors import NodeError, create_chained_call_error
 from uberjob._execution.run_function_on_graph import run_function_on_graph
@@ -45,7 +45,7 @@ class BoundCall:
 
 
 def _create_bound_call(
-    graph: Graph, call: Call, result_lookup: Dict[Node, Any]
+    graph: Graph, call: Call, result_lookup: dict[Node, Any]
 ) -> BoundCall:
     args, kwargs = get_argument_nodes(graph, call)
     args = [result_lookup[predecessor] for predecessor in args]
@@ -71,7 +71,7 @@ def _create_bound_call_lookup_and_output_slot(
 
 
 class PrepRunPhysical(NamedTuple):
-    bound_call_lookup: Dict[Node, BoundCall]
+    bound_call_lookup: dict[Node, BoundCall]
     output_slot: Slot
     process: Callable[[Node], None]
     plan: Plan

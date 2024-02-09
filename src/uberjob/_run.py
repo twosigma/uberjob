@@ -15,7 +15,8 @@
 #
 import collections
 import datetime as dt
-from typing import Callable, Iterable, Optional, Tuple, Union
+from collections.abc import Iterable
+from typing import Callable, Optional, Union
 
 from uberjob._errors import CallError
 from uberjob._execution.run_function_on_graph import NodeError
@@ -84,7 +85,7 @@ def run(
     fresh_time: Optional[dt.datetime] = None,
     progress: Union[None, bool, Progress, Iterable[Progress]] = True,
     scheduler: Optional[str] = None,
-    transform_physical: Optional[Callable[[Plan, Node], Tuple[Plan, Node]]] = None,
+    transform_physical: Optional[Callable[[Plan, Node], tuple[Plan, Node]]] = None,
     stale_check_max_workers: Optional[int] = None,
 ):
     """

@@ -13,13 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from typing import Tuple
-
 from uberjob._util import fully_qualified_name
 from uberjob.graph import Call
 
 
-def get_full_call_scope(call: Call) -> Tuple:
+def get_full_call_scope(call: Call) -> tuple:
     return (*call.scope, fully_qualified_name(call.fn))
 
 

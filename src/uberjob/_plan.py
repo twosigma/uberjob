@@ -14,9 +14,10 @@
 # limitations under the License.
 #
 import operator
+from collections.abc import Generator
 from contextlib import contextmanager
 from threading import RLock
-from typing import Callable, Generator, Tuple
+from typing import Callable
 
 from uberjob import _builtins
 from uberjob._util import validation
@@ -140,7 +141,7 @@ class Plan:
         """
         return self._gather(get_stack_frame(), value)
 
-    def unpack(self, iterable, length: int) -> Tuple[Node, ...]:
+    def unpack(self, iterable, length: int) -> tuple[Node, ...]:
         """
         Unpack a symbolic iterable into a tuple of symbolic values.
 

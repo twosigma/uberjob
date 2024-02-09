@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+from collections.abc import Iterable
 from contextlib import ExitStack
-from typing import Iterable, Tuple
 
 from uberjob.progress._progress_observer import ProgressObserver
 
@@ -39,21 +39,21 @@ class CompositeProgressObserver(ProgressObserver):
     def __exit__(self, exc_type, exc_val, exc_tb):
         self._stack.__exit__(exc_type, exc_val, exc_tb)
 
-    def increment_total(self, *, section: str, scope: Tuple, amount: int):
+    def increment_total(self, *, section: str, scope: tuple, amount: int):
         for progress_observer in self._progress_observers:
             progress_observer.increment_total(
                 section=section, scope=scope, amount=amount
             )
 
-    def increment_running(self, *, section: str, scope: Tuple):
+    def increment_running(self, *, section: str, scope: tuple):
         for progress_observer in self._progress_observers:
             progress_observer.increment_running(section=section, scope=scope)
 
-    def increment_completed(self, *, section: str, scope: Tuple):
+    def increment_completed(self, *, section: str, scope: tuple):
         for progress_observer in self._progress_observers:
             progress_observer.increment_completed(section=section, scope=scope)
 
-    def increment_failed(self, *, section: str, scope: Tuple, exception: Exception):
+    def increment_failed(self, *, section: str, scope: tuple, exception: Exception):
         for progress_observer in self._progress_observers:
             progress_observer.increment_failed(
                 section=section, scope=scope, exception=exception

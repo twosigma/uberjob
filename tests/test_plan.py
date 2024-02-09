@@ -339,7 +339,7 @@ class PlanTestCase(UberjobTestCase):
 
     def test_traceback_manipulation(self):
         def x():
-            raise IOError("buzz")
+            raise OSError("buzz")
 
         def y():
             try:

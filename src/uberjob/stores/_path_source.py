@@ -63,7 +63,7 @@ class PathSource(ValueStore):
     def _get_modified_time(self, required):
         modified_time = get_modified_time(self.path)
         if modified_time is None and required:
-            raise IOError(
+            raise OSError(
                 f"Failed to get modified time of required source path {self.path!r}."
             )
         return modified_time

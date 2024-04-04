@@ -16,8 +16,8 @@
 import datetime as dt
 import pathlib
 import traceback
+from collections.abc import Callable
 from html import escape
-from typing import Callable, Union
 
 from uberjob.progress._simple_progress_observer import (
     ScopeState,
@@ -209,7 +209,7 @@ class HtmlProgressObserver(SimpleProgressObserver):
 
     def __init__(
         self,
-        output: Union[str, pathlib.Path, Callable[[bytes], None]],
+        output: str | pathlib.Path | Callable[[bytes], None],
         *,
         initial_update_delay,
         min_update_interval,

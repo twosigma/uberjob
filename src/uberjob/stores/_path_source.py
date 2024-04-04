@@ -15,7 +15,6 @@
 #
 import datetime as dt
 import pathlib
-import typing
 
 from uberjob._util import repr_helper
 from uberjob._value_store import ValueStore
@@ -33,11 +32,11 @@ class PathSource(ValueStore):
 
     __slots__ = ("path", "required")
 
-    def __init__(self, path: typing.Union[str, pathlib.Path], *, required: bool = True):
+    def __init__(self, path: str | pathlib.Path, *, required: bool = True):
         self.path = path
         self.required = required
 
-    def read(self) -> typing.Union[str, pathlib.Path]:
+    def read(self) -> str | pathlib.Path:
         """
         Get the path.
 
@@ -51,7 +50,7 @@ class PathSource(ValueStore):
         """Not implemented."""
         raise NotImplementedError()
 
-    def get_modified_time(self) -> typing.Optional[dt.datetime]:
+    def get_modified_time(self) -> dt.datetime | None:
         """
         Get the modified time of the file.
 

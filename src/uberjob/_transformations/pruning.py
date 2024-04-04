@@ -14,8 +14,7 @@
 # limitations under the License.
 #
 import itertools
-from collections.abc import Iterable
-from typing import Callable, Optional
+from collections.abc import Callable, Iterable
 
 from uberjob._plan import Plan
 from uberjob._transformations import get_mutable_plan
@@ -27,7 +26,7 @@ def prune_plan(
     plan: Plan,
     *,
     required_nodes: Iterable[Node],
-    output_node: Optional[Node],
+    output_node: Node | None,
     inplace: bool
 ) -> Plan:
     required_nodes = set(required_nodes)
@@ -73,7 +72,7 @@ def _prune_literal_if_trivial(plan: Plan, literal: Literal) -> None:
 
 
 def prune_source_literals(
-    plan: Plan, *, inplace: bool, predicate: Optional[Callable[[Literal], bool]] = None
+    plan: Plan, *, inplace: bool, predicate: Callable[[Literal], bool] | None = None
 ) -> Plan:
     """
     Prunes source literals. When predicate is present, the literal will only be pruned if it returns true.

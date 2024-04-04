@@ -14,7 +14,6 @@
 # limitations under the License.
 #
 import datetime as dt
-import typing
 
 from uberjob._util import repr_helper
 from uberjob._value_store import ValueStore
@@ -31,7 +30,7 @@ class LiteralSource(ValueStore):
 
     __slots__ = ("value", "modified_time")
 
-    def __init__(self, value, modified_time: typing.Optional[dt.datetime]):
+    def __init__(self, value, modified_time: dt.datetime | None):
         self.value = value
         self.modified_time = modified_time
 
@@ -43,7 +42,7 @@ class LiteralSource(ValueStore):
         """Not implemented."""
         raise NotImplementedError()
 
-    def get_modified_time(self) -> typing.Optional[dt.datetime]:
+    def get_modified_time(self) -> dt.datetime | None:
         """Get the modified time."""
         return self.modified_time
 

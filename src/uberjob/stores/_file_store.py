@@ -19,7 +19,7 @@ import pathlib
 from abc import ABC, abstractmethod
 from collections.abc import Generator
 from contextlib import contextmanager
-from typing import IO, AnyStr, Optional, Union
+from typing import IO, AnyStr
 
 from uberjob._util import repr_helper
 from uberjob._value_store import ValueStore
@@ -27,7 +27,7 @@ from uberjob._value_store import ValueStore
 STAGING_SUFFIX = ".STAGING"
 
 
-def get_modified_time(path: Union[str, pathlib.Path]) -> Optional[dt.datetime]:
+def get_modified_time(path: str | pathlib.Path) -> dt.datetime | None:
     """
     Gets the modified time of the path, or ``None`` if it does not exist or is inaccessible.
 
@@ -49,8 +49,8 @@ def _try_remove(path):
 
 @contextmanager
 def staged_write_path(
-    path: Union[str, pathlib.Path]
-) -> Generator[Union[str, pathlib.Path], None, None]:
+    path: str | pathlib.Path,
+) -> Generator[str | pathlib.Path, None, None]:
     """
     Context manager for writing a file atomically.
 
@@ -72,7 +72,7 @@ def staged_write_path(
 
 @contextmanager
 def staged_write(
-    path: Union[str, pathlib.Path], mode="w", **kwargs
+    path: str | pathlib.Path, mode="w", **kwargs
 ) -> Generator[IO[AnyStr], None, None]:
     """
     Context manager for writing a file atomically.
@@ -100,7 +100,7 @@ class FileStore(ValueStore, ABC):
 
     __slots__ = ("path",)
 
-    def __init__(self, path: Union[str, pathlib.Path]):
+    def __init__(self, path: str | pathlib.Path):
         self.path = path
 
     @abstractmethod
@@ -115,7 +115,7 @@ class FileStore(ValueStore, ABC):
         :param value: The value.
         """
 
-    def get_modified_time(self) -> Optional[dt.datetime]:
+    def get_modified_time(self) -> dt.datetime | None:
         """Get the modified time of the file, or ``None`` if it does not exist or is inaccessible."""
         return get_modified_time(self.path)
 

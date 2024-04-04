@@ -130,13 +130,13 @@ class Scope:
 
 
 def render(
-    plan: typing.Union[Plan, Graph, tuple[Plan, typing.Optional[Node]]],
+    plan: Plan | Graph | tuple[Plan, Node | None],
     *,
     registry: Registry = None,
     predicate: typing.Callable[[Node, dict], bool] = None,
-    level: typing.Optional[int] = None,
-    format: typing.Optional[str] = None
-) -> typing.Optional[bytes]:
+    level: int | None = None,
+    format: str | None = None
+) -> bytes | None:
     """
     Use :mod:`nxv` to render a plan's symbolic call graph.
 

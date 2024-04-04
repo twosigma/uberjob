@@ -15,7 +15,6 @@
 #
 import collections
 import datetime as dt
-from typing import Optional
 
 from uberjob._errors import NodeError, create_chained_call_error
 from uberjob._execution.run_function_on_graph import run_function_on_graph
@@ -39,7 +38,7 @@ class BarrierType:
 Barrier = BarrierType()
 
 
-def _to_naive_utc_time(value: Optional[dt.datetime]) -> Optional[dt.datetime]:
+def _to_naive_utc_time(value: dt.datetime | None) -> dt.datetime | None:
     return (
         value.astimezone(dt.timezone.utc).replace(tzinfo=None)
         if value and value.tzinfo
@@ -60,8 +59,8 @@ def _get_stale_nodes(
     registry: Registry,
     *,
     retry,
-    max_workers: Optional[int] = None,
-    fresh_time: Optional[dt.datetime] = None,
+    max_workers: int | None = None,
+    fresh_time: dt.datetime | None = None,
     progress_observer: ProgressObserver,
 ) -> set[Node]:
     plan = prune_source_literals(
@@ -132,7 +131,7 @@ def _get_stale_nodes(
 
 def _add_value_store(
     plan: Plan, node: Node, registry_value: RegistryValue, *, is_stale: bool
-) -> tuple[Optional[Node], Node]:
+) -> tuple[Node | None, Node]:
     def nested_call(*args):
         call = plan._call(registry_value.stack_frame, *args)
         if type(node) is Call:
@@ -185,13 +184,13 @@ def plan_with_value_stores(
     plan: Plan,
     registry: Registry,
     *,
-    output_node: Optional[Node],
-    max_workers: Optional[int] = None,
+    output_node: Node | None,
+    max_workers: int | None = None,
     retry,
-    fresh_time: Optional[dt.datetime] = None,
+    fresh_time: dt.datetime | None = None,
     inplace: bool,
     progress_observer,
-) -> tuple[Plan, Optional[Node]]:
+) -> tuple[Plan, Node | None]:
     _update_stale_totals(plan, registry, progress_observer)
     plan = get_mutable_plan(plan, inplace=inplace)
     stale_nodes = _get_stale_nodes(

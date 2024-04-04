@@ -35,7 +35,7 @@ class TestMountedFileStore(MountedStore):
         with open(local_path, "wb") as f:
             f.write(self.remote_store.read())
 
-    def get_modified_time(self) -> typing.Optional[dt.datetime]:
+    def get_modified_time(self) -> dt.datetime | None:
         return self.remote_store.get_modified_time()
 
     def __repr__(self):

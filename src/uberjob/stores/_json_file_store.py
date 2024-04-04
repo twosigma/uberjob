@@ -15,7 +15,6 @@
 #
 import json
 import pathlib
-import typing
 
 from uberjob._util import repr_helper
 from uberjob.stores._file_store import FileStore, staged_write
@@ -31,12 +30,7 @@ class JsonFileStore(FileStore):
 
     __slots__ = ("encoding",)
 
-    def __init__(
-        self,
-        path: typing.Union[str, pathlib.Path],
-        *,
-        encoding: typing.Optional[str] = None
-    ):
+    def __init__(self, path: str | pathlib.Path, *, encoding: str | None = None):
         super().__init__(path)
         self.encoding = encoding
 

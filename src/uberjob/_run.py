@@ -15,8 +15,7 @@
 #
 import collections
 import datetime as dt
-from collections.abc import Iterable
-from typing import Callable, Optional, Union
+from collections.abc import Callable, Iterable
 
 from uberjob._errors import CallError
 from uberjob._execution.run_function_on_graph import NodeError
@@ -47,9 +46,7 @@ def _update_run_totals(plan: Plan, progress_observer: ProgressObserver) -> None:
         progress_observer.increment_total(section="run", scope=scope, amount=count)
 
 
-def _coerce_progress(
-    progress: Union[None, bool, Progress, Iterable[Progress]]
-) -> Progress:
+def _coerce_progress(progress: None | bool | Progress | Iterable[Progress]) -> Progress:
     if not progress:
         return null_progress
     try:
@@ -66,7 +63,7 @@ def _coerce_progress(
 
 
 def _coerce_retry(
-    retry: Union[None, int, Callable[[Callable], Callable]]
+    retry: None | int | Callable[[Callable], Callable]
 ) -> Callable[[Callable], Callable]:
     if callable(retry):
         return retry
@@ -77,16 +74,16 @@ def run(
     plan: Plan,
     *,
     output=None,
-    registry: Optional[Registry] = None,
+    registry: Registry | None = None,
     dry_run: bool = False,
-    max_workers: Optional[int] = None,
-    max_errors: Optional[int] = 0,
-    retry: Union[None, int, Callable[[Callable], Callable]] = None,
-    fresh_time: Optional[dt.datetime] = None,
-    progress: Union[None, bool, Progress, Iterable[Progress]] = True,
-    scheduler: Optional[str] = None,
-    transform_physical: Optional[Callable[[Plan, Node], tuple[Plan, Node]]] = None,
-    stale_check_max_workers: Optional[int] = None,
+    max_workers: int | None = None,
+    max_errors: int | None = 0,
+    retry: None | int | Callable[[Callable], Callable] = None,
+    fresh_time: dt.datetime | None = None,
+    progress: None | bool | Progress | Iterable[Progress] = True,
+    scheduler: str | None = None,
+    transform_physical: Callable[[Plan, Node], tuple[Plan, Node]] | None = None,
+    stale_check_max_workers: int | None = None,
 ):
     """
     Run a :class:`~uberjob.Plan`.

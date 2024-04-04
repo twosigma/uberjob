@@ -14,7 +14,6 @@
 # limitations under the License.
 #
 import datetime as dt
-import typing
 from abc import ABC, abstractmethod
 
 
@@ -36,5 +35,5 @@ class ValueStore(ABC):
         """
 
     @abstractmethod
-    def get_modified_time(self) -> typing.Optional[dt.datetime]:
+    def get_modified_time(self) -> dt.datetime | None:
         """Get the modified time of the stored value, or ``None`` if there is no stored value."""

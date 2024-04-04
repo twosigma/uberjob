@@ -14,7 +14,6 @@
 # limitations under the License.
 #
 import datetime as dt
-import typing
 
 from uberjob._util import Missing, repr_helper
 from uberjob._value_store import ValueStore
@@ -79,7 +78,7 @@ class TestStore(ValueStore):
         self.value = value
         self.modified_time = dt.datetime.utcnow()
 
-    def get_modified_time(self) -> typing.Optional[dt.datetime]:
+    def get_modified_time(self) -> dt.datetime | None:
         if not self.can_get_modified_time:
             raise Exception("This test store cannot get modified time.")
         return self.modified_time

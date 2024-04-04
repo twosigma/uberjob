@@ -15,7 +15,7 @@
 #
 """Provides the underlying graph, node, and edge classes used by the :class:`~uberjob.Plan`."""
 import warnings
-from typing import Callable
+from collections.abc import Callable
 
 import networkx as nx
 

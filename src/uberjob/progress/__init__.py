@@ -15,8 +15,8 @@
 #
 """The state of a running Plan can be observed through the use of Progress."""
 import pathlib
+from collections.abc import Callable
 from functools import partial
-from typing import Callable, Union
 
 from uberjob._util import is_ipython
 
@@ -54,9 +54,7 @@ ipython_progress = Progress(
 """Display observed progress using IPython widgets."""
 
 
-def html_progress(
-    output: Union[str, pathlib.Path, Callable[[bytes], None]]
-) -> Progress:
+def html_progress(output: str | pathlib.Path | Callable[[bytes], None]) -> Progress:
     """
     Write observed progress to an HTML file.
 

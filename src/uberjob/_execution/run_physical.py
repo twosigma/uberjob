@@ -14,7 +14,8 @@
 # limitations under the License.
 #
 """Functionality for executing a physical plan"""
-from typing import Any, Callable, NamedTuple, Optional
+from collections.abc import Callable
+from typing import Any, NamedTuple
 
 from uberjob._errors import NodeError, create_chained_call_error
 from uberjob._execution.run_function_on_graph import run_function_on_graph
@@ -55,7 +56,7 @@ def _create_bound_call(
 
 
 def _create_bound_call_lookup_and_output_slot(
-    plan: Plan, output_node: Optional[Node] = None
+    plan: Plan, output_node: Node | None = None
 ):
     result_lookup = {
         node: node if type(node) is Literal else Slot(None)
@@ -81,9 +82,9 @@ def prep_run_physical(
     plan: Plan,
     *,
     inplace: bool,
-    output_node: Optional[Node] = None,
-    retry: Optional[Callable[[Callable], Callable]] = None,
-    progress_observer: Optional[ProgressObserver] = None,
+    output_node: Node | None = None,
+    retry: Callable[[Callable], Callable] | None = None,
+    progress_observer: ProgressObserver | None = None,
 ):
     bound_call_lookup, output_slot = _create_bound_call_lookup_and_output_slot(
         plan, output_node
@@ -119,11 +120,11 @@ def run_physical(
     plan: Plan,
     *,
     inplace: bool,
-    output_node: Optional[Node] = None,
-    retry: Optional[Callable[[Callable], Callable]] = None,
-    max_workers: Optional[int] = None,
-    max_errors: Optional[int] = 0,
-    scheduler: Optional[str] = None,
+    output_node: Node | None = None,
+    retry: Callable[[Callable], Callable] | None = None,
+    max_workers: int | None = None,
+    max_errors: int | None = 0,
+    scheduler: str | None = None,
     progress_observer: ProgressObserver,
 ) -> Any:
     _, output_slot, process, plan = prep_run_physical(

@@ -14,10 +14,9 @@
 # limitations under the License.
 #
 import operator
-from collections.abc import Generator
+from collections.abc import Callable, Generator
 from contextlib import contextmanager
 from threading import RLock
-from typing import Callable
 
 from uberjob import _builtins
 from uberjob._util import validation

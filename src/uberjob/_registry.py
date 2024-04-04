@@ -89,7 +89,7 @@ class Registry:
         """
         return self.mapping[node].value_store
 
-    def get(self, node: Node) -> typing.Optional[ValueStore]:
+    def get(self, node: Node) -> ValueStore | None:
         """
         Get the :class:`~uberjob.ValueStore` for a :class:`~uberjob.graph.Node` if it has one, or ``None``.
 

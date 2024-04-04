@@ -42,9 +42,10 @@ def install_with_constraints(session, *args, **kwargs):
 @nox.session()
 def black(session):
     """Run black code formatter."""
+    session.run("poetry", "install", external=True)
     args = session.posargs or SOURCES
-    session.run("isort", *args)
-    session.run("black", *args)
+    session.run("isort", *args, external=True)
+    session.run("black", *args, external=True)
 
 
 @nox.session()
@@ -52,7 +53,7 @@ def lint(session):
     """Lint using flake8."""
     args = session.posargs or SOURCES
     session.run("poetry", "install", external=True)
-    session.run("poetry", "run", "flake8", *args, external=True)
+    session.run("flake8", *args, external=True)
 
 
 @nox.session()
@@ -60,12 +61,13 @@ def tests(session):
     """Run the test suite."""
     args = session.posargs or ["--cov"]
     session.run("poetry", "install", external=True)
-    session.run("poetry", "run", "pytest", *args, external=True)
+    session.run("pytest", *args, external=True)
 
 
 @nox.session()
 def coverage(session):
     """Upload coverage data."""
+    session.run("poetry", "install", external=True)
     session.run("coverage", "xml", "--fail-under=0")
     session.run("codecov", *session.posargs)
 

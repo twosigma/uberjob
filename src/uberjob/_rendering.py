@@ -13,8 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import typing
-from collections import OrderedDict
+from collections.abc import Callable
 
 from uberjob._plan import Plan
 from uberjob._registry import Registry
@@ -35,7 +34,7 @@ PURPLE = (187 / 255, 47 / 255, 237 / 255)
 GRAY = (0.4, 0.4, 0.4)
 
 
-def default_style(registry: Registry = None):
+def default_style(registry: Registry | None = None):
     import nxv
 
     if registry is None:
@@ -132,8 +131,8 @@ class Scope:
 def render(
     plan: Plan | Graph | tuple[Plan, Node | None],
     *,
-    registry: Registry = None,
-    predicate: typing.Callable[[Node, dict], bool] = None,
+    registry: Registry | None = None,
+    predicate: None | Callable[[Node, dict], bool] = None,
     level: int | None = None,
     format: str | None = None
 ) -> bytes | None:
@@ -165,7 +164,7 @@ def render(
         )
 
     if level is not None:
-        scope_groups = OrderedDict()
+        scope_groups = {}
         for u in graph.nodes():
             scope = u.scope
             if scope:

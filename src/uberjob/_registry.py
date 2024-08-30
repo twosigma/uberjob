@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 import copy
-import typing
+from collections.abc import Iterable, KeysView
 
 from uberjob._builtins import source
 from uberjob._plan import Node, Plan
@@ -99,7 +99,7 @@ class Registry:
         v = self.mapping.get(node)
         return v.value_store if v else None
 
-    def keys(self) -> typing.KeysView[Node]:
+    def keys(self) -> KeysView[Node]:
         """
         Get all registered :class:`~uberjob.graph.Node` instances.
 
@@ -123,7 +123,7 @@ class Registry:
         """
         return [(k, v.value_store) for k, v in self.mapping.items()]
 
-    def __iter__(self) -> typing.Iterable[Node]:
+    def __iter__(self) -> Iterable[Node]:
         """
         Get all registered :class:`~uberjob.graph.Node` instances.
 

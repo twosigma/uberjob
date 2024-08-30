@@ -15,8 +15,8 @@
 #
 import os
 import tempfile
-import typing
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from contextlib import contextmanager
 
 from uberjob._util import repr_helper
@@ -38,7 +38,7 @@ class MountedStore(ValueStore, ABC):
 
     __slots__ = ("create_store",)
 
-    def __init__(self, create_store: typing.Callable[[str], ValueStore]):
+    def __init__(self, create_store: Callable[[str], ValueStore]):
         self.create_store = create_store
         """Creates an instance of the underlying :class:`~uberjob.ValueStore` for the given path."""
 

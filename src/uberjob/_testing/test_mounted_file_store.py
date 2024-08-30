@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 import datetime as dt
-import typing
+from collections.abc import Callable
 
 from uberjob._testing.test_store import TestStore
 from uberjob._util import repr_helper
@@ -23,7 +23,7 @@ from uberjob.stores._mounted_store import MountedStore
 
 
 class TestMountedFileStore(MountedStore):
-    def __init__(self, create_file_store: typing.Callable[[str], FileStore]):
+    def __init__(self, create_file_store: Callable[[str], FileStore]):
         super().__init__(create_file_store)
         self.remote_store = TestStore()
 

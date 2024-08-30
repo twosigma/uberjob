@@ -40,11 +40,6 @@ GATHER_LOOKUP = {
 }
 
 
-def _is_node(value) -> bool:
-    """Efficiently determines whether the given value is a :class:`~uberjob.graph.Node`."""
-    return type(value) in (Call, Literal)
-
-
 class Plan:
     """Represents a symbolic call graph."""
 
@@ -90,7 +85,7 @@ class Plan:
         :param value: The literal value.
         :return: The symbolic literal value.
         """
-        if _is_node(value):
+        if isinstance(value, Node):
             raise TypeError(f"The value is already a {Node.__name__}.")
         literal = Literal(value, scope=self._scope)
         self.graph.add_node(literal)
@@ -118,12 +113,12 @@ class Plan:
             if gather_fn is not None:
                 items = root.items() if root_type is dict else root
                 children = [recurse(item) for item in items]
-                if any(_is_node(child) for child in children):
+                if any(isinstance(child, Node) for child in children):
                     return self._call(stack_frame, gather_fn, *children)
             return root
 
         value = recurse(value)
-        return value if _is_node(value) else self.lit(value)
+        return value if isinstance(value, Node) else self.lit(value)
 
     def gather(self, value) -> Node:
         """

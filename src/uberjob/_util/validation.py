@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 import inspect
-import typing
+from collections.abc import Callable
 from functools import lru_cache
 
 from uberjob._util import fully_qualified_name
@@ -57,14 +57,14 @@ def assert_is_instance(
 
 
 @lru_cache(4096)
-def try_get_signature(fn: typing.Callable):
+def try_get_signature(fn: Callable):
     try:
         return inspect.signature(fn)
     except ValueError:
         return None
 
 
-def assert_can_bind(fn: typing.Callable, *args, **kwargs):
+def assert_can_bind(fn: Callable, *args, **kwargs):
     sig = try_get_signature(fn)
     if sig is None:
         return

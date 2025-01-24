@@ -48,20 +48,18 @@ class StackFrame:
         )
 
 
-TruncatedStackFrame = None
-
-
 class TruncatedStackFrameType:
+    def __new__(cls):
+        return TruncatedStackFrame
+
+    def __getnewargs__(self):
+        return ()
+
     def __repr__(self):
         return "TruncatedStackFrame"
 
-    def __new__(cls, *args, **kwargs):
-        if TruncatedStackFrame is not None:
-            return TruncatedStackFrame
-        return super().__new__(cls, *args, **kwargs)
 
-
-TruncatedStackFrame = TruncatedStackFrameType()
+TruncatedStackFrame = object.__new__(TruncatedStackFrameType)
 
 
 MAX_TRACEBACK_DEPTH = 3

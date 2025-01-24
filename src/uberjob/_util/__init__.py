@@ -37,23 +37,31 @@ compact_repr = compact_repr.repr
 
 
 class OmittedType:
-    __slots__ = ()
+    def __new__(cls):
+        return Omitted
+
+    def __getnewargs__(self):
+        return ()
 
     def __repr__(self):
         return "<...>"
 
 
-Omitted = OmittedType()
+Omitted = object.__new__(OmittedType)
 
 
 class MissingType:
-    __slots__ = ()
+    def __new__(cls):
+        return Missing
+
+    def __getnewargs__(self):
+        return ()
 
     def __repr__(self):
         return "Missing"
 
 
-Missing = MissingType()
+Missing = object.__new__(MissingType)
 
 
 class Slot:

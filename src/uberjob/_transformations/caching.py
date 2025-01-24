@@ -29,13 +29,17 @@ from uberjob.progress._progress_observer import ProgressObserver
 
 
 class BarrierType:
-    __slots__ = ()
+    def __new__(cls):
+        return Barrier
+
+    def __getnewargs__(self):
+        return ()
 
     def __repr__(self):
         return "Barrier"
 
 
-Barrier = BarrierType()
+Barrier = object.__new__(BarrierType)
 
 
 def _to_naive_utc_time(value: dt.datetime | None) -> dt.datetime | None:

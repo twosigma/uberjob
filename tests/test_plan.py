@@ -405,3 +405,10 @@ class PlanTestCase(UberjobTestCase):
         self.assertIsInstance(unpickled_exception, NodeError)
         self.assertIsInstance(unpickled_exception.node, Call)
         self.assertIs(unpickled_exception.node.fn, pow)
+
+    def test_plan_pickle_round_trip(self):
+        plan = uberjob.Plan()
+        result = plan.call(pow, 3, 2)
+        plan2, result2 = pickle.loads(pickle.dumps([plan, result]))
+        self.assertEqual(plan2._scope, ())
+        self.assertEqual(uberjob.run(plan2, output=result2), 9)

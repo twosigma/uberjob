@@ -49,6 +49,14 @@ class Plan:
         self._scope = ()
         self._scope_lock = RLock()
 
+    def __getstate__(self) -> dict:
+        return {"graph": self.graph}
+
+    def __setstate__(self, state: dict) -> None:
+        self.graph = state["graph"]
+        self._scope = ()
+        self._scope_lock = RLock()
+
     def _call(self, stack_frame, fn: Callable, *args, **kwargs) -> Call:
         call = Call(fn, scope=self._scope, stack_frame=stack_frame)
         self.graph.add_node(call)

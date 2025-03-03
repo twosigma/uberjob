@@ -1,4 +1,3 @@
-
 API Reference
 =============
 
@@ -40,6 +39,13 @@ uberjob.ValueStore
 ------------------
 
 .. autoclass:: uberjob.ValueStore
+   :members:
+
+
+uberjob.AsyncValueStore
+---------------------
+
+.. autoclass:: uberjob.AsyncValueStore
    :members:
 
 

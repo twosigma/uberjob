@@ -13,6 +13,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+from ._async_stores import (
+    AsyncBinaryFileStore,
+    AsyncFileStore,
+    AsyncJsonFileStore,
+    AsyncPickleFileStore,
+    AsyncTextFileStore,
+    AsyncTouchFileStore,
+    AsyncValueStore,
+    async_get_modified_time,
+    async_staged_write,
+    async_staged_write_path,
+)
 from ._binary_file_store import BinaryFileStore
 from ._file_store import FileStore, get_modified_time, staged_write, staged_write_path
 from ._json_file_store import JsonFileStore
@@ -38,4 +50,15 @@ __all__ = [
     "PickleFileStore",
     "TextFileStore",
     "TouchFileStore",
+    # Async classes
+    "AsyncBinaryFileStore",
+    "AsyncFileStore",
+    "AsyncJsonFileStore",
+    "AsyncPickleFileStore",
+    "AsyncTextFileStore",
+    "AsyncTouchFileStore",
+    "AsyncValueStore",
+    "async_get_modified_time",
+    "async_staged_write",
+    "async_staged_write_path",
 ]

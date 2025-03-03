@@ -17,3 +17,4 @@ The lessons below introduce important concepts in uberjob.
    lesson6
    lesson7
    lesson8
+   async

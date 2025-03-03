@@ -32,6 +32,7 @@ __email__ = "Daniel.Shields@twosigma.com, Timothy.Shields@twosigma.com"
 __version__ = "1.0.2"
 
 from uberjob import graph, progress, stores
+from uberjob._async_value_store import AsyncValueStore
 from uberjob._errors import CallError, NotTransformedError
 from uberjob._plan import Plan
 from uberjob._registry import Registry
@@ -47,6 +48,7 @@ __all__ = [
     "run",
     "render",
     "ValueStore",
+    "AsyncValueStore",
     "stores",
     "CallError",
     "NotTransformedError",

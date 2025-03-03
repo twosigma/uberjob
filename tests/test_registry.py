@@ -142,7 +142,7 @@ class RegistryTestCase(UberjobTestCase):
     def test_fresh_time_advanced(self):
         p = uberjob.Plan()
         r = uberjob.Registry()
-        t0 = dt.datetime.now()
+        t0 = dt.datetime.utcnow()
         store_a = TestStore(7, modified_time=t0)
         a = r.source(p, store_a)
         store_c = TestStore()

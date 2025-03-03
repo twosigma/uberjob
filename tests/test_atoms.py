@@ -17,9 +17,9 @@
 import pickle
 import unittest
 
-from uberjob._transformations.caching import BarrierType, Barrier
-from uberjob._util import MissingType, Missing, OmittedType, Omitted
-from uberjob._util.traceback import TruncatedStackFrameType, TruncatedStackFrame
+from uberjob._transformations.caching import Barrier, BarrierType
+from uberjob._util import Missing, MissingType, Omitted, OmittedType
+from uberjob._util.traceback import TruncatedStackFrame, TruncatedStackFrameType
 
 ATOMS = [
     (BarrierType, Barrier, "Barrier"),
